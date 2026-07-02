@@ -66,7 +66,7 @@
   .node-shield{fill:var(--ink);opacity:.94}
   .node text{fill:var(--text);pointer-events:none;text-anchor:middle}
   .node .lbl{font-size:11px;font-weight:600}
-  .link{fill:none}
+  .link{fill:none;stroke-linecap:round;stroke-linejoin:round}
   .flow{stroke-dasharray:3 6;animation:flow 1.4s linear infinite}
   @keyframes flow{to{stroke-dashoffset:-9}}
   .pulse{transform-box:fill-box;transform-origin:center;animation:breathe 3.2s ease-in-out infinite}
@@ -110,7 +110,7 @@
 
   <h3>Use the map</h3>
   <ul>
-    <li>Click a node to trace amber upstream dependencies and cyan downstream unlocks.</li>
+    <li>Click a node to trace a focused dependency tree with directional arrowheads.</li>
     <li>Click empty space to clear the trace.</li>
     <li>Toggle layers in the lower-left legend to isolate one part of the system.</li>
     <li>Turn on shadow mode to reveal dual-use risk paths.</li>
@@ -120,7 +120,8 @@
   <h3>Read the structure</h3>
   <ul>
     <li>Left to right is earliest maturity, not importance.</li>
-    <li>Thick edges are strong enablers; thin edges are partial enablers; dashed edges are feedback or meaning links.</li>
+    <li>Metro-style edges are quiet by default; trace mode makes direction explicit.</li>
+    <li>Thicker edges are strong enablers; thinner edges are partial enablers; dashed edges are feedback or meaning links.</li>
     <li>Speculative edges are hidden by default for readability. Use the legend toggle to show them.</li>
     <li>Pulsing nodes are maintained states that decay without ongoing institutional work.</li>
     <li>Double-ring nodes are irreducible sinks: governance, meaning, and great-power peace.</li>
@@ -270,10 +271,10 @@ const shadowSel=g.append('g').selectAll('path').data(SHADOW).join('path')
 const linkSel=g.append('g').selectAll('path').data(LINKS).join('path')
   .attr('class',d=>'link'+(d.type==='f'?' flow':''))
   .attr('stroke','#2a3347')
-  .attr('stroke-width',d=>d.type==='s'?2.2:1.1)
+  .attr('stroke-width',d=>d.type==='s'?1.8:1)
   .attr('stroke-dasharray',d=>d.type==='f'?'3 6':null)
-  .attr('marker-end','url(#arrow)')
-  .attr('opacity',d=>d.conf==='low'?.26:.68);
+  .attr('marker-end',null)
+  .attr('opacity',d=>d.conf==='low'?.16:.32);
 
 const edgeLbl=g.append('g').selectAll('text').data(LINKS.filter(l=>l.label)).join('text')
   .attr('class','edgelabel').text(d=>d.label);
@@ -317,36 +318,60 @@ function pointToSegmentDistance(px,py,ax,ay,bx,by){
   const t=Math.max(0,Math.min(1,((px-ax)*dx+(py-ay)*dy)/len2));
   return Math.hypot(px-(ax+t*dx),py-(ay+t*dy));
 }
-function sampleCurve(r,steps=18){
-  const pts=[];
-  for(let i=0;i<=steps;i++){
-    const t=i/steps,mt=1-t;
-    pts.push({
-      x:mt*mt*mt*r.sx+3*mt*mt*t*r.c1x+3*mt*t*t*r.c2x+t*t*t*r.tx,
-      y:mt*mt*mt*r.sy+3*mt*mt*t*r.c1y+3*mt*t*t*r.c2y+t*t*t*r.ty
-    });
-  }
-  return pts;
-}
 function ccw(a,b,c){return(c.y-a.y)*(b.x-a.x)>(b.y-a.y)*(c.x-a.x);}
 function segmentIntersects(a,b,c,d){
   if(Math.max(a.x,b.x)<Math.min(c.x,d.x)||Math.max(c.x,d.x)<Math.min(a.x,b.x))return false;
   if(Math.max(a.y,b.y)<Math.min(c.y,d.y)||Math.max(c.y,d.y)<Math.min(a.y,b.y))return false;
   return ccw(a,c,d)!==ccw(b,c,d)&&ccw(a,b,c)!==ccw(a,b,d);
 }
-function makeRoute(d,bend){
-  const dx=d.target.x-d.source.x,dy=d.target.y-d.source.y,dist=Math.hypot(dx,dy)||1;
-  const sx=d.source.x+dx/dist*(d.source.r+2),sy=d.source.y+dy/dist*(d.source.r+2);
-  const tx=d.target.x-dx/dist*(d.target.r+6),ty=d.target.y-dy/dist*(d.target.r+6);
-  const nX=-dy/dist,nY=dx/dist;
-  const a=Array.isArray(bend)?bend[0]:bend,b=Array.isArray(bend)?bend[1]:bend;
-  const c1x=sx+dx/3+nX*a,c1y=sy+dy/3+nY*a;
-  const c2x=sx+2*dx/3+nX*b,c2y=sy+2*dy/3+nY*b;
-  const r={sx,sy,tx,ty,c1x,c1y,c2x,c2y};
-  r.points=sampleCurve(r);
-  r.labelX=(sx+3*c1x+3*c2x+tx)/8;
-  r.labelY=(sy+3*c1y+3*c2y+ty)/8-5;
-  r.path=`M${sx},${sy} C${c1x},${c1y} ${c2x},${c2y} ${tx},${ty}`;
+function linePoints(a,b,step=18){
+  const dist=Math.hypot(b.x-a.x,b.y-a.y)||1,steps=Math.max(1,Math.ceil(dist/step)),pts=[];
+  for(let i=0;i<=steps;i++){
+    const t=i/steps;
+    pts.push({x:a.x+(b.x-a.x)*t,y:a.y+(b.y-a.y)*t});
+  }
+  return pts;
+}
+function roundedPolylinePath(points,radius=16){
+  if(points.length<2)return '';
+  let path=`M${points[0].x},${points[0].y}`;
+  for(let i=1;i<points.length-1;i++){
+    const prev=points[i-1],cur=points[i],next=points[i+1];
+    const inLen=Math.hypot(cur.x-prev.x,cur.y-prev.y);
+    const outLen=Math.hypot(next.x-cur.x,next.y-cur.y);
+    if(inLen<1||outLen<1){path+=` L${cur.x},${cur.y}`;continue;}
+    const r=Math.min(radius,inLen/2,outLen/2);
+    const before={x:cur.x-(cur.x-prev.x)/inLen*r,y:cur.y-(cur.y-prev.y)/inLen*r};
+    const after={x:cur.x+(next.x-cur.x)/outLen*r,y:cur.y+(next.y-cur.y)/outLen*r};
+    path+=` L${before.x},${before.y} Q${cur.x},${cur.y} ${after.x},${after.y}`;
+  }
+  const end=points[points.length-1];
+  return `${path} L${end.x},${end.y}`;
+}
+function makeRoute(d,laneY){
+  const dx=d.target.x-d.source.x,dir=dx>=0?1:-1;
+  const sx=d.source.x+dir*(d.source.r+2),sy=d.source.y;
+  const tx=d.target.x-dir*(d.target.r+8),ty=d.target.y;
+  const lead=Math.min(120,Math.max(46,Math.abs(tx-sx)*.2));
+  let x1=sx+dir*lead,x2=tx-dir*lead;
+  if(dir*(x2-x1)<42){
+    const mid=(sx+tx)/2;
+    x1=mid-dir*22;
+    x2=mid+dir*22;
+  }
+  const raw=[
+    {x:sx,y:sy},{x:x1,y:sy},{x:x1,y:laneY},
+    {x:x2,y:laneY},{x:x2,y:ty},{x:tx,y:ty}
+  ];
+  const pts=[];
+  raw.forEach((p,i)=>{
+    if(i===0)pts.push(p);
+    else pts.push(...linePoints(raw[i-1],p).slice(1));
+  });
+  const r={sx,sy,tx,ty,x1,x2,laneY,points:pts};
+  r.labelX=(x1+x2)/2;
+  r.labelY=laneY-5;
+  r.path=roundedPolylinePath(raw,d.type==='s'?18:14);
   return r;
 }
 function routeNodePenalty(route,d){
@@ -379,21 +404,20 @@ function routeIntersectionPenalty(route,d,routed){
   return score;
 }
 function bestRoute(d,routed){
-  const base=d.type==='f'?42:30;
-  const offsets=[
-    [base,base],[-base,-base],[base+42,base+42],[-base-42,-base-42],
-    [base+92,base+92],[-base-92,-base-92],[base+150,base+150],[-base-150,-base-150],
-    [base+220,base+220],[-base-220,-base-220],
-    [base+80,-base-80],[-base-80,base+80],[base+150,-base-150],[-base-150,base+150],
-    [base+230,-base-230],[-base-230,base+230],[0,0]
-  ];
+  const mid=(d.source.y+d.target.y)/2;
+  const lanes=[];
+  for(let y=72;y<=H-96;y+=34)lanes.push(y);
+  [mid,d.source.y-56,d.source.y+56,d.target.y-56,d.target.y+56].forEach(y=>{
+    if(y>56&&y<H-76)lanes.push(y);
+  });
   let best=null,bestScore=Infinity;
-  offsets.forEach(offset=>{
-    const route=makeRoute(d,offset);
+  [...new Set(lanes.map(y=>Math.round(y)))].forEach(laneY=>{
+    const route=makeRoute(d,laneY);
     const nodePenalty=routeNodePenalty(route,d);
     const crossingPenalty=routeIntersectionPenalty(route,d,routed);
-    const curvePenalty=(Math.abs(offset[0])+Math.abs(offset[1]))*.03;
-    const score=nodePenalty+crossingPenalty+curvePenalty;
+    const lanePenalty=Math.abs(laneY-mid)*.22;
+    const bendPenalty=(Math.abs(laneY-d.source.y)+Math.abs(laneY-d.target.y))*.04;
+    const score=nodePenalty+crossingPenalty+lanePenalty+bendPenalty;
     if(score<bestScore){best=route;bestScore=score;}
   });
   return best;
@@ -421,26 +445,43 @@ sim.on('tick',()=>{
 });
 
 // ---- trace ----
-const outAdj={},inAdj={};NODES.forEach(n=>{outAdj[n.id]=[];inAdj[n.id]=[];});
-LINKS.forEach(l=>{const s=l.source.id||l.source,t=l.target.id||l.target;outAdj[s].push(t);inAdj[t].push(s);});
-function bfs(start,adj){const seen=new Set([start]),q=[start];while(q.length){const c=q.shift();adj[c].forEach(n=>{if(!seen.has(n)){seen.add(n);q.push(n);}});}seen.delete(start);return seen;}
-function baseOpacity(d){return d.conf==='low'?.26:.68;}
+function edgeKey(l){return `${l.source.id||l.source}->${l.target.id||l.target}`;}
+function walkTrace(start,direction){
+  const seen=new Set([start]),edges=new Set(),q=[start];
+  const traceLinks=LINKS.filter(l=>l.type!=='f');
+  while(q.length){
+    const current=q.shift();
+    traceLinks.forEach(l=>{
+      const s=l.source.id||l.source,t=l.target.id||l.target;
+      const next=direction==='down'&&s===current?t:direction==='up'&&t===current?s:null;
+      if(next&&!seen.has(next)){
+        seen.add(next);
+        edges.add(`${s}->${t}`);
+        q.push(next);
+      }
+    });
+  }
+  seen.delete(start);
+  return {nodes:seen,edges};
+}
+function baseOpacity(d){return d.conf==='low'?.16:.32;}
 
 function trace(d){
   closeGuide();
-  const down=bfs(d.id,outAdj),up=bfs(d.id,inAdj);
-  nodeSel.attr('opacity',n=>n.id===d.id||down.has(n.id)||up.has(n.id)?1:.12);
+  const down=walkTrace(d.id,'down'),up=walkTrace(d.id,'up');
+  nodeSel.attr('opacity',n=>n.id===d.id||down.nodes.has(n.id)||up.nodes.has(n.id)?1:.12);
   nodeSel.select('circle:not(.pulse)')
-    .attr('stroke',n=>n.id===d.id?'#fff':up.has(n.id)?'var(--up)':down.has(n.id)?'var(--down)':LAYERS[n.layer].color)
-    .attr('stroke-width',n=>n.id===d.id?3.5:(up.has(n.id)||down.has(n.id))?2.6:1.6);
+    .attr('stroke',n=>n.id===d.id?'#fff':up.nodes.has(n.id)?'var(--up)':down.nodes.has(n.id)?'var(--down)':LAYERS[n.layer].color)
+    .attr('stroke-width',n=>n.id===d.id?3.5:(up.nodes.has(n.id)||down.nodes.has(n.id))?2.6:1.6);
   linkSel.each(function(l){
     const s=l.source.id,t=l.target.id;
-    const inD=(s===d.id||down.has(s))&&down.has(t),inU=up.has(s)&&(t===d.id||up.has(t));
+    const key=`${s}->${t}`,inD=down.edges.has(key),inU=up.edges.has(key);
     d3.select(this).attr('opacity',inD||inU?1:.04)
       .attr('stroke',inD?'var(--down)':inU?'var(--up)':'#2a3347')
-      .attr('marker-end',inD?'url(#arrow-down)':inU?'url(#arrow-up)':'url(#arrow)');
+      .attr('stroke-width',inD||inU?(l.type==='s'?2.8:2):l.type==='s'?1.8:1)
+      .attr('marker-end',inD?'url(#arrow-down)':inU?'url(#arrow-up)':null);
   });
-  edgeLbl.style('opacity',l=>{const s=l.source.id,t=l.target.id;return((s===d.id||down.has(s))&&down.has(t))||(up.has(s)&&(t===d.id||up.has(t)))?1:0;});
+  edgeLbl.style('opacity',l=>down.edges.has(edgeKey(l))||up.edges.has(edgeKey(l))?1:0);
   const el=document.getElementById('info');el.classList.add('show');
   document.getElementById('i-layer').textContent=LAYERS[d.layer].name;
   document.getElementById('i-layer').style.color=LAYERS[d.layer].color;
@@ -449,13 +490,14 @@ function trace(d){
   document.getElementById('i-desc').textContent=d.desc;
   document.getElementById('i-maint').textContent=d.frag==='maintain'?'⟳ Decays without continuous upkeep — needs institutions, not a breakthrough.':'';
   document.getElementById('i-deps').innerHTML=
-    `<b>Needs ↑</b> ${up.size?[...up].map(i=>nodeById[i].name).join(', '):'nothing — root'}<br>`+
-    `<i>Unlocks ↓</i> ${down.size?[...down].map(i=>nodeById[i].name).join(', '):'nothing — terminal sink'}`;
+    `<b>Needs ↑</b> ${up.nodes.size?[...up.nodes].map(i=>nodeById[i].name).join(', '):'nothing — root'}<br>`+
+    `<i>Unlocks ↓</i> ${down.nodes.size?[...down.nodes].map(i=>nodeById[i].name).join(', '):'nothing — terminal sink'}`;
 }
 function clearTrace(){
   nodeSel.attr('opacity',1);
   nodeSel.select('circle:not(.pulse)').attr('stroke',n=>LAYERS[n.layer].color).attr('stroke-width',n=>n.layer==='given'||n.sink?3:1.6);
-  linkSel.attr('opacity',baseOpacity).attr('stroke','#2a3347').attr('marker-end','url(#arrow)');
+  linkSel.attr('opacity',baseOpacity).attr('stroke','#2a3347')
+    .attr('stroke-width',d=>d.type==='s'?1.8:1).attr('marker-end',null);
   edgeLbl.style('opacity',0);
   document.getElementById('info').classList.remove('show');
 }

@@ -44,7 +44,11 @@ crowded decade where most hubs mature, and shows which problems (longevity,
 demographic transition) are still running on their own clock decades later
 no matter how much intelligence you throw at them.
 
-**Edge weight:** thick = strong enabling, thin = partial, dashed = a
+**Edge style:** edges use metro-style lanes so the default map reads as a
+quiet system diagram. Arrowheads stay hidden until you click a node; trace
+mode then makes direction explicit.
+
+**Edge weight:** thicker = strong enabling, thinner = partial, dashed = a
 feedback or "meaning" edge (softer, harder to defend, but real — e.g.
 longevity shifting political time horizons).
 
@@ -73,10 +77,10 @@ the same nodes; only the edges differ.
 
 ## How to use it
 
-- **Click a node** to trace its full dependency chain: amber upstream
-  (everything it needs), cyan downstream (everything it unlocks). The side
-  panel shows its maturity year, whether it's solve-once or maintained,
-  and a plain-language description.
+- **Click a node** to trace a focused dependency tree: amber upstream
+  (what it needs), cyan downstream (what it unlocks). Directional arrowheads
+  appear only in this trace mode. The side panel shows its maturity year,
+  whether it's solve-once or maintained, and a plain-language description.
 - **Click empty space** to clear the trace.
 - **Toggle layers** in the legend to isolate one part of the system —
   useful for looking at just the planetary layer, or just expansion.
