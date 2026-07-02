@@ -48,9 +48,10 @@ no matter how much intelligence you throw at them.
 feedback or "meaning" edge (softer, harder to defend, but real — e.g.
 longevity shifting political time horizons).
 
-**Edge opacity:** faint edges are the speculative bets in this model; solid
-edges are the ones I'd defend as close to structural fact. This is an
-honesty signal, not decoration.
+**Speculative edges:** the default view hides lower-confidence edges to keep
+the graph readable. Toggle them on from the legend when you want the full
+model; when shown, they appear faint. This is an honesty signal, not
+decoration.
 
 **Pulsing rings:** a node that pulses is a *maintained state*, not a
 solved problem — governance, peace, climate, ecosystems, meaning. These
@@ -79,6 +80,8 @@ the same nodes; only the edges differ.
 - **Click empty space** to clear the trace.
 - **Toggle layers** in the legend to isolate one part of the system —
   useful for looking at just the planetary layer, or just expansion.
+- **Toggle speculative edges** to switch between the clearer high-confidence
+  map and the full model.
 - **Toggle shadow mode** to see the dual-use risk edges overlaid on the
   same structure.
 - **Drag nodes** to declutter a crowded area; **scroll to zoom**, drag

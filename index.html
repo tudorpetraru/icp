@@ -30,8 +30,10 @@
   .lg-swatch{width:11px;height:11px;border-radius:2px;flex:none}
   #edgekey{margin-top:12px;padding-top:10px;border-top:1px solid var(--grid);font-size:12px;color:var(--dim);line-height:2}
   .ek{display:flex;align-items:center;gap:9px}
-  #shadowbtn{margin-top:12px;width:100%;padding:8px;background:transparent;border:1px solid var(--danger);color:var(--danger);font-family:inherit;font-size:12px;letter-spacing:.08em;cursor:pointer;border-radius:3px;text-transform:uppercase}
+  #shadowbtn,#specbtn{margin-top:12px;width:100%;padding:8px;background:transparent;border:1px solid var(--danger);color:var(--danger);font-family:inherit;font-size:12px;letter-spacing:.08em;cursor:pointer;border-radius:3px;text-transform:uppercase}
+  #specbtn{border-color:#6b7285;color:#4f5668}
   #shadowbtn.on{background:var(--danger);color:#f6f4ee;font-weight:600}
+  #specbtn.on{background:#4f5668;color:#f6f4ee;font-weight:600}
 
   #info{position:absolute;top:0;right:0;width:330px;padding:18px 20px;background:rgba(246,244,238,.94);backdrop-filter:blur(6px);border-left:1px solid var(--grid);border-bottom:1px solid var(--grid);z-index:10;display:none}
   #info.show{display:block}
@@ -61,6 +63,7 @@
   #guide .lede{font-size:14px;color:#333846}
 
   .node{cursor:pointer}
+  .node-shield{fill:var(--ink);opacity:.94}
   .node text{fill:var(--text);pointer-events:none;text-anchor:middle}
   .node .lbl{font-size:11px;font-weight:600}
   .link{fill:none}
@@ -82,7 +85,7 @@
 
 <div id="titleblock">
   <h1>Integrated Civilizational Plan</h1>
-  <div class="sub">Time-ordered dependency schedule under aligned ASI. Left→right: earliest maturity. Thick=strong · thin=partial · dashed=feedback. Faint edges = speculative.</div>
+  <div class="sub">Time-ordered dependency schedule under aligned ASI. Left→right: earliest maturity. Thick=strong · thin=partial · dashed=feedback. Speculative edges are optional.</div>
   <div class="rev">REV D · JUL 2026 · 39 NODES · SHEET 1 OF 1</div>
 </div>
 
@@ -118,7 +121,7 @@
   <ul>
     <li>Left to right is earliest maturity, not importance.</li>
     <li>Thick edges are strong enablers; thin edges are partial enablers; dashed edges are feedback or meaning links.</li>
-    <li>Faint edges are speculative. Solid edges are higher-confidence structural claims.</li>
+    <li>Speculative edges are hidden by default for readability. Use the legend toggle to show them.</li>
     <li>Pulsing nodes are maintained states that decay without ongoing institutional work.</li>
     <li>Double-ring nodes are irreducible sinks: governance, meaning, and great-power peace.</li>
   </ul>
@@ -244,7 +247,14 @@ axis.append('text').attr('class','axisnote').attr('x',xScale(2049)).attr('y',26)
 
 svg.call(d3.zoom().scaleExtent([.3,4]).on('zoom',e=>g.attr('transform',e.transform))).on('click',clearTrace);
 
-NODES.forEach(n=>{n.x=xScale(n.year);n.y=H*BAND[n.layer]+(Math.random()-.5)*40;});
+Object.keys(LAYERS).forEach(layer=>{
+  const group=NODES.filter(n=>n.layer===layer).sort((a,b)=>a.year-b.year||a.name.localeCompare(b.name));
+  group.forEach((n,i)=>{
+    const lane=i-(group.length-1)/2;
+    n.x=xScale(n.year);
+    n.y=H*BAND[n.layer]+lane*22;
+  });
+});
 
 const sim=d3.forceSimulation(NODES)
   .force('link',d3.forceLink(LINKS).id(d=>d.id).distance(l=>l.type==='f'?120:80).strength(l=>l.type==='s'?.12:.05))
@@ -276,6 +286,10 @@ const nodeSel=g.append('g').selectAll('g').data(NODES).join('g')
     .on('end',(e,d)=>{if(!e.active)sim.alphaTarget(0);d.fx=null;d.fy=null;}))
   .on('click',(e,d)=>{e.stopPropagation();trace(d);});
 
+// opaque shield keeps dependency lines from visually running through nodes
+nodeSel.append('circle')
+  .attr('class','node-shield').attr('r',d=>d.r+(d.sink?11:9));
+
 // pulse ring for maintenance nodes (behind main circle)
 nodeSel.filter(d=>d.frag==='maintain').append('circle')
   .attr('class','pulse').attr('r',d=>d.r+4).attr('fill','none')
@@ -297,17 +311,112 @@ nodeSel.each(function(d){
   lines.forEach((ln,i)=>t.append('tspan').attr('x',0).attr('dy',i===0?0:10.5).text(ln));
 });
 
-function arc(d){
+function pointToSegmentDistance(px,py,ax,ay,bx,by){
+  const dx=bx-ax,dy=by-ay,len2=dx*dx+dy*dy;
+  if(!len2)return Math.hypot(px-ax,py-ay);
+  const t=Math.max(0,Math.min(1,((px-ax)*dx+(py-ay)*dy)/len2));
+  return Math.hypot(px-(ax+t*dx),py-(ay+t*dy));
+}
+function sampleCurve(r,steps=18){
+  const pts=[];
+  for(let i=0;i<=steps;i++){
+    const t=i/steps,mt=1-t;
+    pts.push({
+      x:mt*mt*mt*r.sx+3*mt*mt*t*r.c1x+3*mt*t*t*r.c2x+t*t*t*r.tx,
+      y:mt*mt*mt*r.sy+3*mt*mt*t*r.c1y+3*mt*t*t*r.c2y+t*t*t*r.ty
+    });
+  }
+  return pts;
+}
+function ccw(a,b,c){return(c.y-a.y)*(b.x-a.x)>(b.y-a.y)*(c.x-a.x);}
+function segmentIntersects(a,b,c,d){
+  if(Math.max(a.x,b.x)<Math.min(c.x,d.x)||Math.max(c.x,d.x)<Math.min(a.x,b.x))return false;
+  if(Math.max(a.y,b.y)<Math.min(c.y,d.y)||Math.max(c.y,d.y)<Math.min(a.y,b.y))return false;
+  return ccw(a,c,d)!==ccw(b,c,d)&&ccw(a,b,c)!==ccw(a,b,d);
+}
+function makeRoute(d,bend){
   const dx=d.target.x-d.source.x,dy=d.target.y-d.source.y,dist=Math.hypot(dx,dy)||1;
   const sx=d.source.x+dx/dist*(d.source.r+2),sy=d.source.y+dy/dist*(d.source.r+2);
   const tx=d.target.x-dx/dist*(d.target.r+6),ty=d.target.y-dy/dist*(d.target.r+6);
-  const mx=(sx+tx)/2-dy/dist*16,my=(sy+ty)/2+dx/dist*16;
-  return `M${sx},${sy} Q${mx},${my} ${tx},${ty}`;
+  const nX=-dy/dist,nY=dx/dist;
+  const a=Array.isArray(bend)?bend[0]:bend,b=Array.isArray(bend)?bend[1]:bend;
+  const c1x=sx+dx/3+nX*a,c1y=sy+dy/3+nY*a;
+  const c2x=sx+2*dx/3+nX*b,c2y=sy+2*dy/3+nY*b;
+  const r={sx,sy,tx,ty,c1x,c1y,c2x,c2y};
+  r.points=sampleCurve(r);
+  r.labelX=(sx+3*c1x+3*c2x+tx)/8;
+  r.labelY=(sy+3*c1y+3*c2y+ty)/8-5;
+  r.path=`M${sx},${sy} C${c1x},${c1y} ${c2x},${c2y} ${tx},${ty}`;
+  return r;
+}
+function routeNodePenalty(route,d){
+  let score=0;
+  NODES.forEach(n=>{
+    if(n.id===d.source.id||n.id===d.target.id)return;
+    let min=Infinity;
+    for(let i=1;i<route.points.length;i++){
+      const a=route.points[i-1],b=route.points[i];
+      min=Math.min(min,pointToSegmentDistance(n.x,n.y,a.x,a.y,b.x,b.y));
+    }
+    const avoid=n.r+46,hard=n.r+20;
+    if(min<hard)score+=10000000+(hard-min)*12000;
+    else if(min<avoid)score+=(avoid-min)*(avoid-min)*120;
+  });
+  return score;
+}
+function routeIntersectionPenalty(route,d,routed){
+  let score=0;
+  routed.forEach(other=>{
+    const shares=d.source.id===other.edge.source.id||d.source.id===other.edge.target.id||d.target.id===other.edge.source.id||d.target.id===other.edge.target.id;
+    if(shares)return;
+    for(let i=2;i<route.points.length-1;i++){
+      const a=route.points[i-1],b=route.points[i];
+      for(let j=2;j<other.points.length-1;j++){
+        if(segmentIntersects(a,b,other.points[j-1],other.points[j]))score+=1800;
+      }
+    }
+  });
+  return score;
+}
+function bestRoute(d,routed){
+  const base=d.type==='f'?42:30;
+  const offsets=[
+    [base,base],[-base,-base],[base+42,base+42],[-base-42,-base-42],
+    [base+92,base+92],[-base-92,-base-92],[base+150,base+150],[-base-150,-base-150],
+    [base+220,base+220],[-base-220,-base-220],
+    [base+80,-base-80],[-base-80,base+80],[base+150,-base-150],[-base-150,base+150],
+    [base+230,-base-230],[-base-230,base+230],[0,0]
+  ];
+  let best=null,bestScore=Infinity;
+  offsets.forEach(offset=>{
+    const route=makeRoute(d,offset);
+    const nodePenalty=routeNodePenalty(route,d);
+    const crossingPenalty=routeIntersectionPenalty(route,d,routed);
+    const curvePenalty=(Math.abs(offset[0])+Math.abs(offset[1]))*.03;
+    const score=nodePenalty+crossingPenalty+curvePenalty;
+    if(score<bestScore){best=route;bestScore=score;}
+  });
+  return best;
+}
+function routeEdges(edges,existing=[]){
+  const routed=[...existing];
+  const ordered=edges.slice().sort((a,b)=>{
+    const da=Math.hypot(a.target.x-a.source.x,a.target.y-a.source.y);
+    const db=Math.hypot(b.target.x-b.source.x,b.target.y-b.source.y);
+    return db-da;
+  });
+  ordered.forEach(edge=>{
+    edge._route=bestRoute(edge,routed);
+    routed.push({edge,points:edge._route.points});
+  });
+  return routed;
 }
 SHADOW.forEach(s=>{s.source=nodeById[s.source];s.target=nodeById[s.target];});
 sim.on('tick',()=>{
-  linkSel.attr('d',arc);shadowSel.attr('d',arc);
-  edgeLbl.attr('x',d=>(d.source.x+d.target.x)/2).attr('y',d=>(d.source.y+d.target.y)/2-5);
+  const routed=routeEdges(LINKS);
+  routeEdges(SHADOW,routed);
+  linkSel.attr('d',d=>d._route.path);shadowSel.attr('d',d=>d._route.path);
+  edgeLbl.attr('x',d=>d._route.labelX).attr('y',d=>d._route.labelY);
   nodeSel.attr('transform',d=>`translate(${d.x},${d.y})`);
 });
 
@@ -377,21 +486,36 @@ Object.entries(LAYERS).forEach(([key,l])=>{
   row.append('div').attr('class','lg-swatch').style('background',l.color);
   row.append('span').text(l.name);
   row.on('click',()=>{hidden.has(key)?hidden.delete(key):hidden.add(key);row.classed('off',hidden.has(key));
-    nodeSel.style('display',n=>hidden.has(n.layer)?'none':null);
-    linkSel.style('display',lk=>hidden.has(lk.source.layer)||hidden.has(lk.target.layer)?'none':null);
+    updateVisibility();
     clearTrace();});
 });
 lg.append('div').attr('id','edgekey').html(
  `<div class="ek"><svg width="24" height="6"><line x1="0" y1="3" x2="24" y2="3" stroke="#53a8b6" stroke-width="2.2"/></svg>strong enabling</div>
   <div class="ek"><svg width="24" height="6"><line x1="0" y1="3" x2="24" y2="3" stroke="#53a8b6" stroke-width="1"/></svg>partial enabling</div>
   <div class="ek"><svg width="24" height="6"><line x1="0" y1="3" x2="24" y2="3" stroke="#53a8b6" stroke-width="1.4" stroke-dasharray="3 4"/></svg>feedback / meaning</div>
-  <div class="ek" style="opacity:.5"><svg width="24" height="6"><line x1="0" y1="3" x2="24" y2="3" stroke="#53a8b6" stroke-width="1.4"/></svg>faint = speculative</div>
+  <div class="ek" style="opacity:.5"><svg width="24" height="6"><line x1="0" y1="3" x2="24" y2="3" stroke="#53a8b6" stroke-width="1.4"/></svg>speculative edges optional</div>
   <div class="ek"><svg width="24" height="16"><circle cx="8" cy="8" r="5" fill="none" stroke="#ff6b8a" stroke-width="1.5"/><circle cx="8" cy="8" r="7.5" fill="none" stroke="#ff6b8a" stroke-width=".6" stroke-dasharray="2 3"/></svg>irreducible sink</div>
   <div class="ek"><svg width="24" height="14"><circle cx="8" cy="7" r="6" fill="none" stroke="#f4a261" stroke-width="1.6"/></svg>⟳ pulsing = maintained</div>`);
+const specbtn=lg.append('button').attr('id','specbtn').text('Show speculative edges');
+let specOn=false;
+function layerVisibleLink(lk){return !hidden.has(lk.source.layer)&&!hidden.has(lk.target.layer);}
+function updateVisibility(){
+  nodeSel.style('display',n=>hidden.has(n.layer)?'none':null);
+  linkSel.style('display',lk=>layerVisibleLink(lk)&&(specOn||lk.conf!=='low')?null:'none');
+  shadowSel.style('display',lk=>shadowOn&&layerVisibleLink(lk)?null:'none');
+}
+specbtn.on('click',()=>{
+  specOn=!specOn;
+  specbtn.classed('on',specOn).text(specOn?'Hide speculative edges':'Show speculative edges');
+  updateVisibility();
+  clearTrace();
+});
 const sbtn=lg.append('button').attr('id','shadowbtn').text('Show dual-use shadows');
 let shadowOn=false;
 sbtn.on('click',()=>{shadowOn=!shadowOn;sbtn.classed('on',shadowOn).text(shadowOn?'Hide dual-use shadows':'Show dual-use shadows');
-  shadowSel.style('display',shadowOn?null:'none').attr('opacity',shadowOn?.9:0);});
+  updateVisibility();
+  shadowSel.attr('opacity',shadowOn?.9:0);});
+updateVisibility();
 </script>
 </body>
 </html>
