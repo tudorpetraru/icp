@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Integrated Civilizational Plan — Logic & Usage</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#f6f4ee;--text:#20242e;--dim:#6b7285;--grid:#dcd8cc;
+    --accent:#0f7ea3;--warm:#c96a1e;--danger:#c81e2e;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--ink);color:var(--text);font-family:'IBM Plex Mono',monospace;line-height:1.65}
+  header{border-bottom:1px solid var(--grid);padding:18px 20px;background:rgba(246,244,238,.94);position:sticky;top:0;z-index:5;backdrop-filter:blur(8px)}
+  nav{max-width:880px;margin:0 auto;display:flex;justify-content:space-between;gap:16px;align-items:center}
+  nav a{color:var(--accent);text-decoration:none;border-bottom:1px solid rgba(15,126,163,.35)}
+  main{max-width:880px;margin:0 auto;padding:44px 20px 64px}
+  h1,h2{font-family:'Space Grotesk',sans-serif;color:#14161c;line-height:1.15}
+  h1{font-size:clamp(30px,5vw,54px);margin:0 0 18px}
+  h2{font-size:24px;margin:36px 0 12px}
+  p{font-size:15px;margin:0 0 18px}
+  ul,ol{padding-left:22px;margin:0 0 22px}
+  li{margin:8px 0}
+  strong{font-weight:600;color:#14161c}
+  .kicker{font-size:12px;text-transform:uppercase;letter-spacing:.18em;color:var(--dim);margin-bottom:12px}
+  .lede{font-size:18px;color:#333846;max-width:760px}
+  .note{border-left:3px solid var(--warm);padding:10px 0 10px 16px;margin:28px 0;color:#333846}
+  .back{font-size:13px}
+  @media (max-width:640px){nav{align-items:flex-start;flex-direction:column}main{padding-top:30px}}
+</style>
+</head>
+<body>
+<header>
+  <nav>
+    <a class="back" href="./">← Back to the interactive map</a>
+    <a class="back" href="./README.md">Raw markdown</a>
+  </nav>
+</header>
+<main>
+  <div class="kicker">Logic & Usage</div>
+  <h1>The Integrated Civilizational Plan</h1>
+
+  <h2>Why this exists</h2>
+  <p>The 1987 Rockwell <em>Integrated Space Plan</em> was a systems-engineering chart: one fold-out showing how each space capability enabled the next, from Shuttle to Station to Moon to Mars. It wasn't a wish list — it was a dependency graph with a schedule attached.</p>
+  <p>This is the same instrument, aimed at a bigger question: <strong>if aligned ASI exists, what's the shortest path to a civilization that has solved energy, matter, biology, coordination, and its own expansion into the solar system — and what stays hard regardless?</strong></p>
+  <p>The graph answers that by treating every challenge as a node and every "this enables that" relationship as a directed edge, then laying the whole thing out against a real timeline instead of a flat ranked list.</p>
+
+  <h2>What a ranked list hides that a graph shows</h2>
+  <p>A ranked list answers "what matters most." It can't answer "what do I light first so the most downstream cost collapses on its own" — because value and leverage aren't the same axis. Climate is enormously important and barely moves the graph, because it was never a knowledge problem; it's an atoms, capital, and coordination problem, and no upstream breakthrough removes that. Fusion torch propulsion ranks low on any flat importance list, yet it falls out of fusion almost for free once fusion is lit. The graph makes that kind of second-order leverage visible.</p>
+
+  <h2>Reading the structure</h2>
+  <p><strong>Layers (color):</strong> each node belongs to a layer — physical substrate, the ASI premise, multiplier hubs, coordination, bio/interface, human flourishing, planetary stewardship, existential security, expansion, frontier knowledge. Layer position roughly tracks <em>how close a problem is to pure cognition</em> (top) versus <em>how much it's gated by physical, biological, or social wall-clock time</em> (bottom).</p>
+  <p><strong>Time axis (left → right):</strong> each node has an earliest-maturity year, given its dependencies and any latency nothing can shortcut — biological validation, generational change, physical construction. This is the part that makes it a <em>plan</em> rather than a diagram: it shows the 2030s as the crowded decade where most hubs mature, and shows which problems (longevity, demographic transition) are still running on their own clock decades later no matter how much intelligence you throw at them.</p>
+  <p><strong>Edge weight:</strong> thick = strong enabling, thin = partial, dashed = a feedback or "meaning" edge (softer, harder to defend, but real — e.g. longevity shifting political time horizons).</p>
+  <p><strong>Edge opacity:</strong> faint edges are the speculative bets in this model; solid edges are the ones I'd defend as close to structural fact. This is an honesty signal, not decoration.</p>
+  <p><strong>Pulsing rings:</strong> a node that pulses is a <em>maintained state</em>, not a solved problem — governance, peace, climate, ecosystems, meaning. These don't get "finished." They decay without continuous input and need institutions, not just breakthroughs. Solid, non-pulsing nodes (fusion, superconductivity, nanotech, Mars) are solve-once: hard to reach, permanent once you're there.</p>
+  <p><strong>Dashed halo:</strong> marks an <em>irreducible sink</em> — a node nothing upstream fully resolves. There are three: governance & coordination, mental health & meaning, and great-power peace. Every path through the graph eventually routes into one of them.</p>
+  <p><strong>Shadow mode:</strong> toggles a second layer of red edges showing dual-use risk — the same hubs that solve problems (fusion, nanotech, robotics, compute) also cast a weaponization or destabilization shadow, almost all of it landing on the peace node. The utopian graph and the risk graph share the same nodes; only the edges differ.</p>
+
+  <h2>How to use it</h2>
+  <ul>
+    <li><strong>Click a node</strong> to trace its full dependency chain: amber upstream (everything it needs), cyan downstream (everything it unlocks). The side panel shows its maturity year, whether it's solve-once or maintained, and a plain-language description.</li>
+    <li><strong>Click empty space</strong> to clear the trace.</li>
+    <li><strong>Toggle layers</strong> in the legend to isolate one part of the system — useful for looking at just the planetary layer, or just expansion.</li>
+    <li><strong>Toggle shadow mode</strong> to see the dual-use risk edges overlaid on the same structure.</li>
+    <li><strong>Drag nodes</strong> to declutter a crowded area; <strong>scroll to zoom</strong>, drag canvas to pan.</li>
+  </ul>
+
+  <h2>The honest takeaway</h2>
+  <p>Two things fall out of using it this way that a static list can't show:</p>
+  <ol>
+    <li>The crowded middle of the timeline (roughly 2032-2040) is where almost everything hinges on a small number of hubs — fusion, superconductivity, robotics, nanotech. Get those right and the rest of the graph moves fast. Get them wrong and everything downstream stalls.</li>
+    <li>The three irreducible, pulsing sinks — governance, meaning, peace — are not technical problems and never resolve into solved nodes. Every credible path through this graph ends by routing into human institutions and human purpose, which is the one part of the system aligned ASI assists but cannot substitute for.</li>
+  </ol>
+
+  <p class="note"><a href="./">Return to the interactive map</a> and use the guide button in the upper-right corner for a quick reminder while exploring.</p>
+</main>
+</body>
+</html>
