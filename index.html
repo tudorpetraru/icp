@@ -282,13 +282,20 @@ const linkSel=g.append('g').selectAll('path').data(LINKS).join('path')
 const edgeLbl=g.append('g').selectAll('text').data(LINKS.filter(l=>l.label)).join('text')
   .attr('class','edgelabel').text(d=>d.label);
 
+function activateNode(e,d){
+  if(e.pointerType==='touch')return;
+  e.stopPropagation();
+  trace(d);
+}
+
 const nodeSel=g.append('g').selectAll('g').data(NODES).join('g')
   .attr('class','node')
   .call(d3.drag()
     .on('start',(e,d)=>{if(!e.active)sim.alphaTarget(.2).restart();d.fx=d.x;d.fy=d.y;})
     .on('drag',(e,d)=>{d.fx=e.x;d.fy=e.y;})
     .on('end',(e,d)=>{if(!e.active)sim.alphaTarget(0);d.fx=null;d.fy=null;}))
-  .on('click',(e,d)=>{e.stopPropagation();trace(d);});
+  .on('click',activateNode)
+  .on('pointerenter',activateNode);
 
 // opaque shield keeps dependency lines from visually running through nodes
 nodeSel.append('circle')
