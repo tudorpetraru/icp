@@ -312,26 +312,6 @@ nodeSel.each(function(d){
   lines.forEach((ln,i)=>t.append('tspan').attr('x',0).attr('dy',i===0?0:10.5).text(ln));
 });
 
-function pointToSegmentDistance(px,py,ax,ay,bx,by){
-  const dx=bx-ax,dy=by-ay,len2=dx*dx+dy*dy;
-  if(!len2)return Math.hypot(px-ax,py-ay);
-  const t=Math.max(0,Math.min(1,((px-ax)*dx+(py-ay)*dy)/len2));
-  return Math.hypot(px-(ax+t*dx),py-(ay+t*dy));
-}
-function ccw(a,b,c){return(c.y-a.y)*(b.x-a.x)>(b.y-a.y)*(c.x-a.x);}
-function segmentIntersects(a,b,c,d){
-  if(Math.max(a.x,b.x)<Math.min(c.x,d.x)||Math.max(c.x,d.x)<Math.min(a.x,b.x))return false;
-  if(Math.max(a.y,b.y)<Math.min(c.y,d.y)||Math.max(c.y,d.y)<Math.min(a.y,b.y))return false;
-  return ccw(a,c,d)!==ccw(b,c,d)&&ccw(a,b,c)!==ccw(a,b,d);
-}
-function linePoints(a,b,step=18){
-  const dist=Math.hypot(b.x-a.x,b.y-a.y)||1,steps=Math.max(1,Math.ceil(dist/step)),pts=[];
-  for(let i=0;i<=steps;i++){
-    const t=i/steps;
-    pts.push({x:a.x+(b.x-a.x)*t,y:a.y+(b.y-a.y)*t});
-  }
-  return pts;
-}
 function roundedPolylinePath(points,radius=16){
   if(points.length<2)return '';
   let path=`M${points[0].x},${points[0].y}`;
@@ -348,10 +328,23 @@ function roundedPolylinePath(points,radius=16){
   const end=points[points.length-1];
   return `${path} L${end.x},${end.y}`;
 }
-function makeRoute(d,laneY){
+function assignLaneOffsets(edges){
+  const offsets=[0,-34,34,-68,68,-102,102,-136,136];
+  edges
+    .slice()
+    .sort((a,b)=>(a.source.year||0)-(b.source.year||0)||(a.target.year||0)-(b.target.year||0))
+    .forEach((edge,i)=>{edge._laneOffset=offsets[i%offsets.length];});
+}
+function clamp(v,min,max){return Math.max(min,Math.min(max,v));}
+function metroLaneY(d){
+  const mid=(d.source.y+d.target.y)/2+(d._laneOffset||0);
+  return clamp(Math.round(mid/34)*34,72,H-96);
+}
+function makeRoute(d){
   const dx=d.target.x-d.source.x,dir=dx>=0?1:-1;
   const sx=d.source.x+dir*(d.source.r+2),sy=d.source.y;
   const tx=d.target.x-dir*(d.target.r+8),ty=d.target.y;
+  const laneY=metroLaneY(d);
   const lead=Math.min(120,Math.max(46,Math.abs(tx-sx)*.2));
   let x1=sx+dir*lead,x2=tx-dir*lead;
   if(dir*(x2-x1)<42){
@@ -363,82 +356,18 @@ function makeRoute(d,laneY){
     {x:sx,y:sy},{x:x1,y:sy},{x:x1,y:laneY},
     {x:x2,y:laneY},{x:x2,y:ty},{x:tx,y:ty}
   ];
-  const pts=[];
-  raw.forEach((p,i)=>{
-    if(i===0)pts.push(p);
-    else pts.push(...linePoints(raw[i-1],p).slice(1));
-  });
-  const r={sx,sy,tx,ty,x1,x2,laneY,points:pts};
+  const r={sx,sy,tx,ty,x1,x2,laneY};
   r.labelX=(x1+x2)/2;
   r.labelY=laneY-5;
   r.path=roundedPolylinePath(raw,d.type==='s'?18:14);
   return r;
 }
-function routeNodePenalty(route,d){
-  let score=0;
-  NODES.forEach(n=>{
-    if(n.id===d.source.id||n.id===d.target.id)return;
-    let min=Infinity;
-    for(let i=1;i<route.points.length;i++){
-      const a=route.points[i-1],b=route.points[i];
-      min=Math.min(min,pointToSegmentDistance(n.x,n.y,a.x,a.y,b.x,b.y));
-    }
-    const avoid=n.r+46,hard=n.r+20;
-    if(min<hard)score+=10000000+(hard-min)*12000;
-    else if(min<avoid)score+=(avoid-min)*(avoid-min)*120;
-  });
-  return score;
-}
-function routeIntersectionPenalty(route,d,routed){
-  let score=0;
-  routed.forEach(other=>{
-    const shares=d.source.id===other.edge.source.id||d.source.id===other.edge.target.id||d.target.id===other.edge.source.id||d.target.id===other.edge.target.id;
-    if(shares)return;
-    for(let i=2;i<route.points.length-1;i++){
-      const a=route.points[i-1],b=route.points[i];
-      for(let j=2;j<other.points.length-1;j++){
-        if(segmentIntersects(a,b,other.points[j-1],other.points[j]))score+=1800;
-      }
-    }
-  });
-  return score;
-}
-function bestRoute(d,routed){
-  const mid=(d.source.y+d.target.y)/2;
-  const lanes=[];
-  for(let y=72;y<=H-96;y+=34)lanes.push(y);
-  [mid,d.source.y-56,d.source.y+56,d.target.y-56,d.target.y+56].forEach(y=>{
-    if(y>56&&y<H-76)lanes.push(y);
-  });
-  let best=null,bestScore=Infinity;
-  [...new Set(lanes.map(y=>Math.round(y)))].forEach(laneY=>{
-    const route=makeRoute(d,laneY);
-    const nodePenalty=routeNodePenalty(route,d);
-    const crossingPenalty=routeIntersectionPenalty(route,d,routed);
-    const lanePenalty=Math.abs(laneY-mid)*.22;
-    const bendPenalty=(Math.abs(laneY-d.source.y)+Math.abs(laneY-d.target.y))*.04;
-    const score=nodePenalty+crossingPenalty+lanePenalty+bendPenalty;
-    if(score<bestScore){best=route;bestScore=score;}
-  });
-  return best;
-}
-function routeEdges(edges,existing=[]){
-  const routed=[...existing];
-  const ordered=edges.slice().sort((a,b)=>{
-    const da=Math.hypot(a.target.x-a.source.x,a.target.y-a.source.y);
-    const db=Math.hypot(b.target.x-b.source.x,b.target.y-b.source.y);
-    return db-da;
-  });
-  ordered.forEach(edge=>{
-    edge._route=bestRoute(edge,routed);
-    routed.push({edge,points:edge._route.points});
-  });
-  return routed;
-}
 SHADOW.forEach(s=>{s.source=nodeById[s.source];s.target=nodeById[s.target];});
+assignLaneOffsets(LINKS);
+assignLaneOffsets(SHADOW);
 sim.on('tick',()=>{
-  const routed=routeEdges(LINKS);
-  routeEdges(SHADOW,routed);
+  LINKS.forEach(d=>{d._route=makeRoute(d);});
+  SHADOW.forEach(d=>{d._route=makeRoute(d);});
   linkSel.attr('d',d=>d._route.path);shadowSel.attr('d',d=>d._route.path);
   edgeLbl.attr('x',d=>d._route.labelX).attr('y',d=>d._route.labelY);
   nodeSel.attr('transform',d=>`translate(${d.x},${d.y})`);
