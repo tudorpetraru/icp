@@ -36,6 +36,11 @@
   #riskbtn{border-color:var(--danger);color:var(--danger)}
   #specbtn.on{background:#4f5668;color:var(--paper);font-weight:600}
   #riskbtn.on{background:var(--danger);color:var(--paper);font-weight:600}
+  #sitepages{position:absolute;top:14px;right:60px;display:flex;align-items:center;gap:6px;max-width:calc(100vw - 470px);padding:7px 8px;background:var(--panel);backdrop-filter:blur(6px);border:1px solid var(--grid);border-radius:6px;z-index:21;box-shadow:0 4px 18px rgba(20,22,28,.06);overflow-x:auto;white-space:nowrap}
+  #sitepages span{font-size:10px;letter-spacing:.14em;color:var(--dim);margin-right:2px}
+  #sitepages a{display:inline-flex;align-items:center;min-height:24px;padding:5px 8px;border:1px solid var(--grid);border-radius:3px;color:#4f5668;text-decoration:none;font-size:10.5px;letter-spacing:.05em;text-transform:uppercase}
+  #sitepages a:hover{background:rgba(20,22,28,.07)}
+  #sitepages a[aria-current="page"]{border-color:var(--ink);color:var(--ink);background:rgba(20,22,28,.06)}
 
   #info{position:absolute;top:0;right:0;width:350px;padding:18px 20px;background:rgba(246,244,238,.96);backdrop-filter:blur(6px);border-left:1px solid var(--grid);border-bottom:1px solid var(--grid);z-index:12;display:none}
   #info.show{display:block}
@@ -90,6 +95,9 @@
     #edgekey{display:none}
     .lg-row{font-size:11px}
     #specbtn,#riskbtn{padding:6px 7px;font-size:9.5px}
+    #sitepages{top:102px;right:12px;max-width:210px;padding:8px}
+    #sitepages span{display:none}
+    #sitepages a{font-size:9.5px;padding:5px 6px}
     #info{width:78vw}
     #timehint{display:none}
   }
@@ -115,6 +123,12 @@
   <div class="i-deps" id="i-deps"></div>
   <div class="i-hint">Hover or click node to trace · click empty space to clear</div>
 </div>
+
+<nav id="sitepages" aria-label="Site pages">
+  <span>PAGES</span>
+  <a href="./index.html">ICP Rev E</a>
+  <a href="./multiplanetary_society_diagram.html" aria-current="page">Multiplanetary Closure</a>
+</nav>
 
 <button id="guidebtn" type="button" aria-controls="guide" aria-expanded="false" title="Open guide">?</button>
 <aside id="guide" aria-label="Logic and usage guide" aria-hidden="true">

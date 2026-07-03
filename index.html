@@ -17,7 +17,19 @@
   @keyframes flow{to{stroke-dashoffset:-9}}
   @keyframes breathe{0%,100%{opacity:.14;transform:scale(1)}50%{opacity:.5;transform:scale(1.26)}}
   @keyframes helpPulse{0%,100%{transform:scale(1);box-shadow:0 4px 18px rgba(20,22,28,.08)}50%{transform:scale(1.06);box-shadow:0 8px 24px rgba(20,22,28,.12)}}
+  #sitepages a:hover{background:rgba(20,22,28,.07)}
+  #sitepages a[aria-current="page"]{border-color:#20242e;color:#20242e;background:rgba(20,22,28,.06)}
   @media (prefers-reduced-motion: reduce){*{animation:none!important}}
+  @media (max-width:760px){
+    #titleblock{max-width:67vw!important;padding:12px 14px!important}
+    #titleblock h1{font-size:15px!important}
+    #titleblock > div:nth-of-type(1){display:none!important}
+    #titleblock > div:nth-of-type(2){font-size:9.5px!important;line-height:1.35!important}
+    #sitepages{top:102px!important;right:12px!important;max-width:210px!important;padding:8px!important}
+    #sitepages span{display:none!important}
+    #sitepages a{font-size:9.5px!important;padding:5px 6px!important}
+    #timehint{display:none!important}
+  }
 </style>
 </helmet>
 <div style="position:absolute;inset:0;overflow:hidden;background:#f6f4ee">
@@ -45,6 +57,12 @@
   </div>
 
   <div id="timehint" style="position:absolute;bottom:12px;right:16px;font-size:11px;color:#6b7285;letter-spacing:.08em;z-index:10;text-align:right;line-height:1.8;background:rgba(246,244,238,.85);padding:4px 8px;border-radius:3px">CLICK NODE → TRACE · HOVER · DRAG · SCROLL-ZOOM</div>
+
+  <nav id="sitepages" aria-label="Site pages" style="position:absolute;top:14px;right:60px;display:flex;align-items:center;gap:6px;max-width:calc(100vw - 430px);padding:7px 8px;background:rgba(246,244,238,.94);backdrop-filter:blur(6px);border:1px solid #dcd8cc;border-radius:6px;z-index:21;box-shadow:0 4px 18px rgba(20,22,28,.06);overflow-x:auto;white-space:nowrap">
+    <span style="font-size:10px;letter-spacing:.14em;color:#6b7285;margin-right:2px">PAGES</span>
+    <a href="./index.html" aria-current="page" style="display:inline-flex;align-items:center;min-height:24px;padding:5px 8px;border:1px solid #dcd8cc;border-radius:3px;color:#4f5668;text-decoration:none;font-size:10.5px;letter-spacing:.05em;text-transform:uppercase">ICP Rev E</a>
+    <a href="./multiplanetary_society_diagram.html" style="display:inline-flex;align-items:center;min-height:24px;padding:5px 8px;border:1px solid #dcd8cc;border-radius:3px;color:#4f5668;text-decoration:none;font-size:10.5px;letter-spacing:.05em;text-transform:uppercase">Multiplanetary Closure</a>
+  </nav>
 
   <button id="guidebtn" type="button" aria-controls="guide" aria-expanded="false" title="Open guide" style="position:absolute;top:14px;right:14px;width:36px;height:36px;border:1px solid #dcd8cc;border-radius:50%;background:rgba(246,244,238,.94);color:#14161c;font-family:'Space Grotesk',sans-serif;font-size:18px;font-weight:700;line-height:1;z-index:22;cursor:pointer;box-shadow:0 4px 18px rgba(20,22,28,.08);animation:helpPulse 2.8s ease-in-out infinite">?</button>
 
