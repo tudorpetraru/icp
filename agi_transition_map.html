@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Multiplanetary Society Closure Map</title>
+<title>AGI Transition Policy Map</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
@@ -107,9 +107,9 @@
 <div id="chart"></div>
 
 <div id="titleblock">
-  <h1>Multiplanetary Society Closure Map</h1>
-  <div class="sub">A closure-gate audit of settlement, industry and political control. Left→right: base-case maturity, not aspiration.</div>
-  <div class="rev">REV A · JUL 2026 · 35 NODES · SOURCE DOCX</div>
+  <h1>AGI Transition Policy Map</h1>
+  <div class="sub">A four-model synthesis of transition rails, scenario triggers and institutional lock-in. Left→right: earliest useful installation, not certainty.</div>
+  <div class="rev">REV A · JUL 2026 · 39 NODES · FOUR PDF SYNTHESIS</div>
 </div>
 
 <div id="legend"><div class="lg-title">LAYERS — CLICK TO TOGGLE</div></div>
@@ -127,98 +127,109 @@
 <nav id="sitepages" aria-label="Site pages">
   <span>PAGES</span>
   <a href="./index.html">ICP Rev E</a>
-  <a href="./multiplanetary_society_diagram.html" aria-current="page">Multiplanetary Closure</a>
-  <a href="./agi_transition_map.html">AGI Transition</a>
+  <a href="./multiplanetary_society_diagram.html">Multiplanetary Closure</a>
+  <a href="./agi_transition_map.html" aria-current="page">AGI Transition</a>
 </nav>
 
 <button id="guidebtn" type="button" aria-controls="guide" aria-expanded="false" title="Open guide">?</button>
 <aside id="guide" aria-label="Logic and usage guide" aria-hidden="true">
   <button id="guideclose" type="button" aria-label="Close guide">×</button>
   <h2>Logic & usage</h2>
-  <p>This diagram translates the 2026 multiplanetary-society assessment into a closure map. It is not a destination poster. It asks which gates must close before an outpost becomes a settlement, an industrial base, or a polity.</p>
+  <p>This diagram compresses four AGI-transition PDFs into one policy dependency map. It treats the next phase as rails to install before triggers fire, not as a single forecast.</p>
   <h3>Read the structure</h3>
   <ul>
-    <li>Left to right is base-case maturity or institutional readiness.</li>
+    <li>Left to right is the earliest useful installation point for a policy rail or monitoring gate.</li>
     <li>Thicker edges are strong gates; thinner edges are partial enablers; dashed edges are cross-couplings.</li>
-    <li>Pulsing nodes are maintained states: they decay without continuous budgets, skills or legitimacy.</li>
-    <li>Double-ring nodes are settlement outcomes whose weakest closure dimension can veto the tier.</li>
-    <li>Risk mode shows overclaim traps: transport theater, company-town governance and premature birth politics.</li>
+    <li>Pulsing nodes are maintained states: they decay without budgets, enforcement or public legitimacy.</li>
+    <li>Double-ring nodes are regime outcomes or irreducible sinks.</li>
+    <li>Risk mode shows capture traps: oligopoly, proliferation, surveillance, rent capture and emergency overreach.</li>
   </ul>
 </aside>
 
-<div id="timehint">HOVER NODE → TRACE · DRAG · SCROLL-ZOOM<br>BASE-CASE MATURITY AXIS →</div>
+<div id="timehint">HOVER NODE → TRACE · DRAG · SCROLL-ZOOM<br>INSTALLATION / LOCK-IN AXIS →</div>
 
 <script>
 const LAYERS={
-  premise:{name:'Closure premise',color:'#e94560'},
-  transport:{name:'Transport corridor',color:'#6b8299'},
-  industry:{name:'Machine ecology',color:'#3a97a6'},
-  life:{name:'Life-support ecology',color:'#5bb4b8'},
-  medicine:{name:'Medicine / biology',color:'#7a84a0'},
-  economy:{name:'Fiscal economy',color:'#e08b3e'},
-  governance:{name:'Legitimacy / law',color:'#f0688a'},
-  destination:{name:'Destination systems',color:'#7b6bf0'},
-  outcome:{name:'Settlement tiers',color:'#2a9d8f'},
-  risk:{name:'Veto risks',color:'#e0322f'}
+  premise:{name:'Decision frame',color:'#e94560'},
+  capability:{name:'Capability signals',color:'#6b8299'},
+  compute:{name:'Compute / chokepoints',color:'#3a97a6'},
+  safety:{name:'Safety / control',color:'#7a84a0'},
+  economy:{name:'Labor / fiscal',color:'#e08b3e'},
+  distribution:{name:'Distribution floor',color:'#5bb4b8'},
+  institutions:{name:'Institutions / legitimacy',color:'#f0688a'},
+  security:{name:'Security / geopolitics',color:'#e0322f'},
+  society:{name:'Epistemics / meaning',color:'#7b6bf0'},
+  outcome:{name:'Transition regimes',color:'#2a9d8f'},
+  risk:{name:'Capture risks',color:'#e0322f'}
 };
-const BAND={premise:.11,transport:.22,industry:.36,life:.50,medicine:.61,economy:.70,governance:.79,destination:.88,outcome:.56,risk:.92};
+const BAND={premise:.10,capability:.20,compute:.32,safety:.43,economy:.54,distribution:.64,institutions:.75,security:.85,society:.92,outcome:.56,risk:.96};
 const NODES=[
- {id:'LOGIC',name:'Minimum-Gate Logic',layer:'premise',r:24,year:2026,frag:'maintain',desc:'The report scores settlement by the weakest closure dimension. Population and local tonnage do not override missing medicine, industry, food, fiscal or legitimacy gates.'},
- {id:'LAUNCH',name:'Routine Orbital Logistics',layer:'transport',r:18,year:2035,frag:'maintain',desc:'Delivered tonnage, recovery from fleet stand-downs and common cargo interfaces matter more than headline dollars per kilogram.'},
- {id:'STAND',name:'Common Interfaces',layer:'transport',r:15,year:2032,frag:'maintain',desc:'Docking, cargo, fluids, data and rescue standards are institutional technology. Proprietary stacks turn every emergency into a bespoke negotiation.'},
- {id:'DEPOT',name:'Cryogenic Depot',layer:'transport',r:17,year:2038,frag:'solve',desc:'Large tanks, transfer cycles, metering and thermal control must work as an operating service, not a subscale fluid experiment.'},
- {id:'LUNARPORT',name:'Lunar Cargo Port',layer:'transport',r:17,year:2040,frag:'maintain',desc:'The gate is a port: precision landing, dust control, unloading, roads, cranes, storage and inspection under repeated traffic.'},
- {id:'MARSEDL',name:'Mars Heavy EDL',layer:'transport',r:18,year:2050,frag:'solve',desc:'Human-class Mars payloads require a greater-than-20-tonne landing regime. Crew dates before repeated cargo landings are politics, not closure.'},
- {id:'POWER',name:'Firm Power / Heat',layer:'industry',r:19,year:2045,frag:'maintain',desc:'Settlement closure needs reserve power, black-start, process heat and local repair. Nameplate watts are not an industrial grid.'},
- {id:'ISRU',name:'Resource Processing',layer:'industry',r:18,year:2050,frag:'maintain',desc:'Water detected is not a reserve. The closure test is grade, extraction energy, contamination, availability, certification and environmental accounting.'},
- {id:'ROBOT',name:'Autonomous Operations',layer:'industry',r:17,year:2050,frag:'maintain',desc:'AI reduces labor per machine only when actuators, spares, process chemistry and audit trails exist. Uptime and recovery records are the evidence.'},
- {id:'BUILD',name:'Bulk Construction',layer:'industry',r:17,year:2060,frag:'solve',desc:'Local mass first displaces shielding, pads, roads and simple structure. Pressure boundaries still need codes, inspection and traceability.'},
- {id:'MACHINE',name:'Machine Ecology',layer:'industry',r:22,year:2070,frag:'maintain',desc:'The neglected layer: machine tools, metrology, heat treatment, NDE and quality records. Additive manufacturing alone does not close capital replacement.'},
- {id:'WEAR',name:'Wear-Part Chemistry',layer:'industry',r:16,year:2070,frag:'maintain',desc:'Seals, bearings, lubricants, membranes and sterilants are low mass but high criticality. A missing compound can idle a city-scale system.'},
- {id:'ELECT',name:'Electronics Ladder',layer:'industry',r:16,year:2100,frag:'maintain',desc:'Advanced-node parity is unnecessary early. Ordinary controls, sensors, power devices, packaging and test equipment are not optional.'},
- {id:'ECLSS',name:'Water / Air Closure',layer:'life',r:18,year:2050,frag:'maintain',desc:'ISS closure is not settlement closure. Brines, cleaning chemistry, spares, microbial drift and local make-up decide whether loops stay closed.'},
- {id:'FOOD',name:'Food / Nutrients',layer:'life',r:20,year:2065,frag:'maintain',desc:'Food closure requires calories, complete nutrition, N/P/K/S cycling, crop disease recovery and cultural acceptability over years.'},
- {id:'MICROBE',name:'Microbial Stability',layer:'life',r:16,year:2065,frag:'maintain',desc:'The ecosystem is capital equipment. Biofilms, trace toxins and nutrient imbalances can fail slowly while headline closure percentages look good.'},
- {id:'RAD',name:'Lifetime Radiation',layer:'medicine',r:16,year:2060,frag:'maintain',desc:'Solar events are shieldable; galactic cosmic rays are harder. Settlement standards are population standards, not astronaut mission limits.'},
- {id:'GRAV',name:'Partial-Gravity Biology',layer:'medicine',r:22,year:2060,frag:'solve',desc:'No autonomous Moon or Mars civilization is credible without multigenerational mammal evidence at 0.16 or 0.38 g, or a rotation hedge.'},
- {id:'AGHAB',name:'Rotating Habitat',layer:'destination',r:17,year:2090,frag:'solve',desc:'Artificial gravity is ordinary mechanics but large structure. It is the cleanest hedge against a biological uncertainty that planetary surfaces cannot tune.'},
- {id:'MED',name:'Autonomous Medicine',layer:'medicine',r:19,year:2065,frag:'maintain',desc:'No evacuation, delayed advice and rare high-consequence events require local surgery, pharmacy, public health and ethical triage rules.'},
- {id:'PHARMA',name:'Essential Formulary',layer:'medicine',r:16,year:2085,frag:'maintain',desc:'A clinic with imported medicines is not medically closed. Quality control, sterile supply and cold chain matter as much as synthesis.'},
- {id:'MARKET',name:'Anchor Utilities',layer:'economy',r:16,year:2045,frag:'maintain',desc:'The credible early economy sells services in space: power, comms, transport, propellant, oxygen, water, shielding and logistics.'},
- {id:'FISCAL',name:'Fiscal Closure',layer:'economy',r:20,year:2070,frag:'maintain',desc:'A T3 budget must pay for public services, insurance and replacement depreciation without discretionary Earth subsidy.'},
- {id:'CAPITAL',name:'Local Capital Formation',layer:'economy',r:17,year:2110,frag:'maintain',desc:'T4 needs retained earnings, credit and investment that replace productive assets. Export hype is not depreciation accounting.'},
- {id:'RIGHTS',name:'Rights Before Residence',layer:'governance',r:17,year:2045,frag:'maintain',desc:'Air, water, shelter, medical care, communications, due process and exit rights must not depend on an employer dispute.'},
- {id:'ADMIN',name:'Base Administration',layer:'governance',r:17,year:2045,frag:'maintain',desc:'Persistent bases need representation, utility regulation, inspections, transparent rationing and emergency powers with review.'},
- {id:'CHARTER',name:'Civil Charter',layer:'governance',r:20,year:2080,frag:'maintain',desc:'A local polity emerges from courts, taxation, public services, labor rights and inter-polity recognition, not a flag or corporate terms.'},
- {id:'CORRIDOR',name:'Corridor Governance',layer:'governance',r:16,year:2110,frag:'maintain',desc:'Control concentrates at ports, depots, navigation, relays, power beams, ice deposits and rescue coverage. Empty volume is not governable territory.'},
- {id:'MOONT2',name:'Continuous Lunar Base',layer:'destination',r:17,year:2045,frag:'maintain',desc:'T2 entry: continuous occupancy, safe havens, interruption tolerance and local water/oxygen gains. It is not self-maintenance.',sink:true},
- {id:'MARST2',name:'Persistent Mars Base',layer:'destination',r:17,year:2070,frag:'maintain',desc:'Mars T2 requires no-evacuation operations, local water/oxygen/propellant and a surface cadence that survives synodic gaps.',sink:true},
- {id:'LUNART3',name:'Lunar T3 Settlement',layer:'outcome',r:20,year:2078,frag:'maintain',desc:'Volatiles, food, industrial repair, medicine, fiscal services and resident legitimacy must all pass. The weakest dimension sets the tier.',sink:true},
- {id:'MARST3',name:'Mars T3 Settlement',layer:'outcome',r:20,year:2105,frag:'maintain',desc:'The distant autonomy test: no-evacuation medicine, demographic path, local production and legitimate government through light-time delay.',sink:true},
- {id:'FREET3',name:'Free-Space T3 Habitat',layer:'outcome',r:19,year:2090,frag:'maintain',desc:'A rotating habitat can choose gravity, but only after cislunar or asteroid materials and large pressure-volume construction mature.',sink:true},
- {id:'T4',name:'T4 Industrial Base',layer:'outcome',r:22,year:2135,frag:'maintain',desc:'Core mines, power, plants, machine tools, metrology and ordinary electronics must be replaced for decades from local feedstocks.',sink:true},
- {id:'T5',name:'T5 Civilization',layer:'outcome',r:24,year:2180,frag:'maintain',desc:'No Earth-only life, medicine, industrial, knowledge or demographic single point remains. Three generations is an evidence gate, not a slogan.',sink:true}
+ {id:'FRAME',name:'Fragmented Actor Frame',layer:'premise',r:24,year:2026,frag:'maintain',desc:'All four PDFs reject a unitary humanity actor. States, labs, capital, labor, civil society and the Global South have different incentives, so the map starts with actor-relative policy rather than one moral command.'},
+ {id:'UNCERT',name:'Scenario Uncertainty',layer:'premise',r:21,year:2026,frag:'maintain',desc:'AGI and ASI dates are variables, not premises. The robust move is a portfolio of rails plus pre-committed branches keyed to observable triggers.'},
+ {id:'SOURCES',name:'Source Ladder',layer:'premise',r:17,year:2026,frag:'maintain',desc:'The ChatGPT PDF makes the research rail explicit: official and structured sources first, then independent evals, academic literature, reputable news and lab claims with labels.'},
+ {id:'CLAIMS',name:'Claim Ledger',layer:'premise',r:17,year:2026,frag:'maintain',desc:'Fact, inference, forecast and value judgment must not blur. Every load-bearing recommendation gets a confidence level, a contrary case and a falsifier.'},
+ {id:'METR',name:'Capability Monitors',layer:'capability',r:18,year:2026,frag:'maintain',desc:'Agentic time horizon, benchmark saturation and autonomous task reliability are the early-warning instruments. Exact timelines are disputed; trend monitoring is not optional.'},
+ {id:'LABSEP',name:'Independent Evals',layer:'capability',r:17,year:2026,frag:'maintain',desc:'Lab claims are evidence, not verdicts. Third-party safety institutes and independent benchmarks supply the load-bearing separation between marketing and operational risk.'},
+ {id:'TRIGGERS',name:'Trigger Indicators',layer:'capability',r:20,year:2027,frag:'maintain',desc:'Policy branches need activation rules: multi-week autonomous tasks, robust displacement, labor-share breaks, major misuse, or verified control failures.'},
+ {id:'DISPLACE',name:'Labor Dashboards',layer:'economy',r:18,year:2027,frag:'maintain',desc:'The shared no-regret move is measurement. Track AI exposure, entry-level hiring, wages, hours and labor share before the political system is forced to argue from anecdotes.'},
+ {id:'ENTRY',name:'Entry-Level Erosion',layer:'economy',r:16,year:2027,frag:'maintain',desc:'Aggregate unemployment can look calm while the learning ramp closes. The young-worker and apprentice channel is the first credible stress point.'},
+ {id:'COMPUTE',name:'Compute Accounting',layer:'compute',r:21,year:2027,frag:'maintain',desc:'Compute, chips, power and capital are treated as the trackable chokepoint. Accounting is cheap to install early and hard to retrofit after strategic incentives harden.'},
+ {id:'ENERGY',name:'Data-Center Power',layer:'compute',r:17,year:2028,frag:'maintain',desc:'Data-center load ties AI capability to grids, land, cooling and energy politics. A compute tax or public-utility frame depends on this physical ledger.'},
+ {id:'VERIFY',name:'Verification R&D',layer:'compute',r:19,year:2028,frag:'maintain',desc:'Hardware-level governance, on-chip attestation and proof-of-training are not treaty-grade yet. They are option value: build the tools before a treaty is needed.'},
+ {id:'PROVENANCE',name:'Epistemic Provenance',layer:'society',r:18,year:2028,frag:'maintain',desc:'C2PA-style provenance, disclosure and platform accountability are defenses against the liar’s dividend. Detection alone is too brittle.'},
+ {id:'DEEPFAKE',name:'Election Integrity',layer:'society',r:16,year:2028,frag:'maintain',desc:'The near-term democratic risk is not perfect persuasion; it is generalized distrust. Election rules, provenance and liability need to exist before the first industrial-scale crisis.'},
+ {id:'BENEFITS',name:'Portable Benefits',layer:'distribution',r:17,year:2028,frag:'maintain',desc:'Decouple health, insurance and income support from a single employer before labor bargaining power weakens. This rail is robust across slow and fast scenarios.'},
+ {id:'ANTITRUST',name:'Competition Posture',layer:'institutions',r:17,year:2028,frag:'maintain',desc:'Compute/cloud/model vertical integration is a power problem, not only a price problem. Antitrust keeps later policy choices from being set by incumbents.'},
+ {id:'PUBLIC',name:'Public Compute Option',layer:'compute',r:17,year:2029,frag:'maintain',desc:'Public or civic compute gives researchers, SMEs and civil society a floor of access. Its risk is state capture; its purpose is avoiding total dependence on private stacks.'},
+ {id:'LIABILITY',name:'Frontier Liability',layer:'safety',r:17,year:2029,frag:'maintain',desc:'Mandatory liability or insurance shifts some burden back onto frontier developers. It works as a flexible safety rail when regulators cannot specify every technical standard.'},
+ {id:'SAFETY',name:'Third-Party Safety Evals',layer:'safety',r:18,year:2029,frag:'maintain',desc:'Autonomous-agent deployment requires uncensored, external evaluation. Current qualitative evals are not enough for systems that can plan, deceive or recursively improve.'},
+ {id:'GOVCAP',name:'State Capacity',layer:'institutions',r:22,year:2030,frag:'maintain',desc:'The master institutional node: statistical capacity, regulators, safety institutes, courts and procurement expertise. Capability moves fast; state capacity is the slow rail.'},
+ {id:'EXPORT',name:'Export Controls',layer:'security',r:17,year:2030,frag:'maintain',desc:'Export controls are a buying-time tactic, not a durable solution. They help only while compute remains concentrated and adversary self-sufficiency lags.'},
+ {id:'CHIPDIP',name:'Chip Diplomacy',layer:'security',r:17,year:2030,frag:'maintain',desc:'Allied controls, supply-chain bargaining and Global South access rules sit on the same rail. Scarcity policy without equity becomes digital dependency.'},
+ {id:'OPEN',name:'Open-Weight Diffusion',layer:'capability',r:17,year:2030,frag:'maintain',desc:'Open and cheap models partially defeat compute concentration. Diffusion democratizes capability and proliferates misuse at the same time.'},
+ {id:'OWNERSHIP',name:'Predistributed Ownership',layer:'distribution',r:18,year:2030,frag:'maintain',desc:'Broad-based capital stakes or universal basic capital are activated when labor share breaks. Tax-funded versions are less brittle than seizure, but still politically hard.'},
+ {id:'UBS',name:'Universal Basic Services',layer:'distribution',r:19,year:2031,frag:'maintain',desc:'Health, care, education, housing, connectivity and public compute are more inflation-resistant than cash alone. Services are slow institutions, not emergency checks.'},
+ {id:'WAGE',name:'Wage Insurance',layer:'distribution',r:16,year:2029,frag:'maintain',desc:'A bridge for slow and steady scenarios: wage-loss insurance, EITC expansion, apprenticeships and targeted young-worker supports.'},
+ {id:'CARE',name:'Care / Civic Infrastructure',layer:'society',r:16,year:2032,frag:'maintain',desc:'Human-to-human care, civic institutions and local agency are the counterweight to status collapse. Cash solves bills; it does not automatically solve meaning.'},
+ {id:'MEANING',name:'Post-Work Meaning',layer:'society',r:21,year:2035,frag:'maintain',desc:'An irreducible sink. A society that survives displacement but loses agency, status and shared purpose still fails the transition.',sink:true},
+ {id:'EMERGENCY',name:'Deployment Controls',layer:'safety',r:18,year:2030,frag:'maintain',desc:'Pre-drafted emergency controls activate on major misuse or control evidence. Writing them after a crisis invites panic law and capture.'},
+ {id:'INTL',name:'Thin Coordination',layer:'security',r:17,year:2030,frag:'maintain',desc:'The documents converge on weak, non-binding coordination as the baseline. Plan for competition while building the verification tools that could make bargains real.'},
+ {id:'TREATY',name:'Compute Treaty Option',layer:'security',r:19,year:2035,frag:'maintain',desc:'A binding compute or safety regime is conditional: verification must mature and a coalition must form. Until then, treaty talk is not enforcement.',sink:true},
+ {id:'UBI',name:'Large-Scale UBI',layer:'distribution',r:17,year:2035,frag:'maintain',desc:'Cash becomes plausible only under fast displacement with a viable capital, compute or IP-rent tax base. It is not the first rail to install.',sink:true},
+ {id:'SLOW',name:'Slow / Plateau Branch',layer:'outcome',r:17,year:2035,frag:'maintain',desc:'If agentic gains stall and productivity disappoints, the normal automation playbook dominates: reskilling, wage insurance and cautious regulation.',sink:true},
+ {id:'DIFFUSE',name:'Steady Diffusion Branch',layer:'outcome',r:18,year:2035,frag:'maintain',desc:'If broad open diffusion continues, the core package is access, antitrust, portable benefits, services and public compute.',sink:true},
+ {id:'FAST',name:'Fast Concentrated Branch',layer:'outcome',r:19,year:2035,frag:'maintain',desc:'If AGI arrives through concentrated compute and capital, emergency controls, aggressive redistribution and democratic safeguards become decisive.',sink:true},
+ {id:'RACE',name:'Fragmented Race Branch',layer:'outcome',r:18,year:2035,frag:'maintain',desc:'If multipolar competition and proliferation dominate, resilience, cyber defense, export-control triage and limited bargains replace universal governance.',sink:true},
+ {id:'LEGIT',name:'Democratic Legitimacy',layer:'institutions',r:22,year:2040,frag:'maintain',desc:'The central sink. Redistribution without legitimacy becomes coercion; safety without legitimacy becomes surveillance; innovation without legitimacy becomes backlash.',sink:true},
+ {id:'POSTWORK',name:'Post-Work Social Contract',layer:'outcome',r:20,year:2045,frag:'maintain',desc:'The 2030-2050 architecture: services, capital stakes, civic meaning, adapted institutions and an explicit status system after cognitive labor loses its old role.',sink:true},
+ {id:'RESILIENCE',name:'Resilient Transition',layer:'outcome',r:24,year:2050,frag:'maintain',desc:'Success is not one scenario winning. It is keeping agency, welfare, safety and legitimacy intact while the actual trajectory resolves.',sink:true}
 ];
 const L=(source,target,type='s',conf='high',label='')=>({source,target,type,conf,label});
 const LINKS=[
- L('LOGIC','LAUNCH','s','high','tonnage gate'),L('LOGIC','RIGHTS','s','high','rights first'),L('LOGIC','FISCAL','s','high','closure accounts'),
- L('LAUNCH','STAND','w','high','interfaces'),L('STAND','DEPOT','s','high','fluid standards'),L('DEPOT','LUNARPORT','s','high','cislunar logistics'),L('DEPOT','MARSEDL','w','high','campaign mass'),
- L('LUNARPORT','MOONT2','s','high','continuous base'),L('LUNARPORT','POWER','s','high','grid cargo'),L('POWER','ISRU','s','high','process energy'),L('ISRU','BUILD','s','high','local mass'),
- L('ROBOT','ISRU','s','high','autonomous uptime'),L('ROBOT','BUILD','w','high','construction labor'),L('BUILD','MACHINE','s','high','plant hardware'),L('MACHINE','WEAR','s','high','critical spares'),L('MACHINE','ELECT','w','high','test chain'),L('WEAR','ECLSS','s','high','filters/seals'),
- L('POWER','ECLSS','s','high','firm load'),L('ECLSS','FOOD','s','high','water/air'),L('FOOD','MICROBE','s','high','ecosystem control'),L('MICROBE','LUNART3','s','high','ecological gate'),L('FOOD','MARST3','s','high','nutrition gate'),
- L('RAD','GRAV','w','high','population standard'),L('GRAV','LUNART3','s','high','birth evidence'),L('GRAV','MARST3','s','high','0.38g evidence'),L('GRAV','AGHAB','f','high','rotation hedge'),L('AGHAB','FREET3','s','high','~1g option'),
- L('MED','PHARMA','s','high','sterile supply'),L('MED','MARST2','s','high','no evacuation'),L('PHARMA','MARST3','s','high','medical closure'),L('PHARMA','T4','w','high','biochem chain'),
- L('MARKET','FISCAL','s','high','public budget'),L('FISCAL','CAPITAL','s','high','replacement capex'),L('CAPITAL','T4','s','high','endogenous finance'),
- L('RIGHTS','ADMIN','s','high','civil base'),L('ADMIN','MOONT2','w','high','base law'),L('ADMIN','MARST2','w','high','emergency power'),L('ADMIN','CHARTER','s','high','representation'),L('CHARTER','LUNART3','s','high','legitimacy'),L('CHARTER','MARST3','s','high','delay legitimacy'),L('CHARTER','CORRIDOR','w','high','node control'),L('CORRIDOR','T5','s','high','inter-polity rules'),
- L('MARSEDL','MARST2','s','high','cargo before crew'),L('MARST2','MARST3','s','high','persistent base'),L('MOONT2','LUNART3','s','high','T2 to T3'),L('LUNART3','T4','w','high','machine scale'),L('MARST3','T4','w','high','autonomy demand'),L('FREET3','T4','w','high','habitat market'),L('T4','T5','s','high','3 generations'),
- L('ELECT','T4','s','high','controls closure'),L('POWER','AGHAB','w','low','structure energy'),L('ISRU','FREET3','w','low','shielding mass'),L('CORRIDOR','MARST3','f','low','trade rules')
+ L('FRAME','UNCERT','s','high','no single actor'),L('FRAME','SOURCES','w','high','source discipline'),L('FRAME','GOVCAP','s','high','actor map'),
+ L('SOURCES','CLAIMS','s','high','claim-source map'),L('SOURCES','LABSEP','s','high','source ladder'),L('CLAIMS','TRIGGERS','s','high','falsifiers'),
+ L('METR','TRIGGERS','s','high','time horizon'),L('LABSEP','SAFETY','s','high','external tests'),L('TRIGGERS','DISPLACE','w','high','labor signal'),L('TRIGGERS','EMERGENCY','s','high','misuse signal'),
+ L('TRIGGERS','SLOW','w','high','stall'),L('TRIGGERS','DIFFUSE','w','high','open gains'),L('TRIGGERS','FAST','w','high','multi-week agents'),L('TRIGGERS','RACE','w','high','proliferation'),
+ L('DISPLACE','ENTRY','s','high','first stress'),L('DISPLACE','OWNERSHIP','s','high','labor share'),L('DISPLACE','UBS','w','high','scale services'),L('DISPLACE','WAGE','s','high','near-term bridge'),
+ L('ENTRY','WAGE','s','high','youth support'),L('ENTRY','CARE','w','high','status repair'),L('WAGE','LEGIT','w','high','shock absorber'),
+ L('COMPUTE','VERIFY','s','high','attestation'),L('COMPUTE','ENERGY','s','high','physical ledger'),L('COMPUTE','EXPORT','w','high','chokepoint'),L('COMPUTE','PUBLIC','w','high','access floor'),L('COMPUTE','ANTITRUST','s','high','market power'),
+ L('ENERGY','UBS','w','low','compute dividend'),L('VERIFY','TREATY','s','high','treaty option'),L('VERIFY','EMERGENCY','w','low','audit hooks'),
+ L('PROVENANCE','DEEPFAKE','s','high','trust rail'),L('DEEPFAKE','LEGIT','s','high','democracy gate'),
+ L('BENEFITS','LEGIT','w','high','floor'),L('OWNERSHIP','LEGIT','s','high','power share'),L('OWNERSHIP','UBS','w','high','funding base'),L('UBS','LEGIT','s','high','durable floor'),L('UBS','UBI','w','low','cash branch'),
+ L('CARE','MEANING','s','high','local agency'),L('MEANING','POSTWORK','s','high','status system'),
+ L('ANTITRUST','PUBLIC','w','high','counterweight'),L('ANTITRUST','LEGIT','w','high','anti-capture'),L('PUBLIC','DIFFUSE','s','high','access'),L('PUBLIC','LEGIT','w','high','public baseline'),
+ L('LIABILITY','SAFETY','s','high','burden shift'),L('SAFETY','EMERGENCY','s','high','deployment gate'),L('SAFETY','LEGIT','w','high','public trust'),
+ L('GOVCAP','COMPUTE','s','high','reporting'),L('GOVCAP','PROVENANCE','s','high','standards'),L('GOVCAP','BENEFITS','s','high','benefit rails'),L('GOVCAP','ANTITRUST','s','high','enforcement'),L('GOVCAP','LIABILITY','w','high','tort capacity'),
+ L('EXPORT','CHIPDIP','s','high','allied stack'),L('CHIPDIP','INTL','w','high','thin bargains'),L('INTL','TREATY','w','high','coalition'),L('OPEN','DIFFUSE','s','high','capability spread'),L('OPEN','RACE','w','high','misuse spread'),
+ L('EMERGENCY','FAST','s','high','fast branch'),L('EMERGENCY','RACE','w','high','misuse branch'),L('TREATY','RESILIENCE','w','high','verified restraint'),
+ L('SLOW','RESILIENCE','w','high','normal playbook'),L('DIFFUSE','RESILIENCE','w','high','access plus guardrails'),L('FAST','RESILIENCE','w','high','panic avoided'),L('RACE','RESILIENCE','w','high','resilience'),L('LEGIT','RESILIENCE','s','high','consent'),L('POSTWORK','RESILIENCE','s','high','meaning')
 ];
 const SHADOW=[
- ['LAUNCH','MOONT2','transport theater'],['MARKET','FISCAL','single customer'],['ADMIN','CHARTER','company town'],['GRAV','T5','premature births'],['MACHINE','T4','3D-printing myth'],['CORRIDOR','T5','chokepoint monopoly'],['ELECT','T4','Earth-only controls']
+ ['COMPUTE','ANTITRUST','oligopoly capture'],['EXPORT','RACE','self-sufficiency spiral'],['OPEN','RACE','proliferation'],['PROVENANCE','LEGIT','liar’s dividend'],['PUBLIC','LEGIT','state narrative machine'],['UBS','LEGIT','rent capture'],['EMERGENCY','LEGIT','authoritarian overreach'],['FAST','LEGIT','panic law'],['VERIFY','TREATY','surveillance treaty']
 ].map(([source,target,label])=>({source,target,label}));
 
 const nodeById=Object.fromEntries(NODES.map(n=>[n.id,n]));
-const YEAR_MIN=2025,YEAR_MAX=2185;
+const YEAR_MIN=2026,YEAR_MAX=2050;
 let W=window.innerWidth,H=window.innerHeight;
 const leftSafe=W<760?Math.max(96,W*.24):320;
 const rightSafe=W<760?48:120;
@@ -234,12 +245,12 @@ const defs=svg.append('defs');
 });
 
 const axis=g.append('g');
-for(let y=2025;y<=2180;y+=25){
+for(let y=2026;y<=2050;y+=4){
   axis.append('line').attr('class','yeargrid').attr('x1',xScale(y)).attr('x2',xScale(y)).attr('y1',38).attr('y2',H-70);
   axis.append('text').attr('class','yearlbl').attr('x',xScale(y)).attr('y',H-52).text(y);
 }
-axis.append('text').attr('class','axisnote').attr('x',xScale(2025)).attr('y',28).text('◄ 2026');
-axis.append('text').attr('class','axisnote').attr('x',xScale(2180)).attr('y',28).attr('text-anchor','end').text('AUTONOMY ►');
+axis.append('text').attr('class','axisnote').attr('x',xScale(2026)).attr('y',28).text('◄ 2026');
+axis.append('text').attr('class','axisnote').attr('x',xScale(2050)).attr('y',28).attr('text-anchor','end').text('LOCK-IN ►');
 svg.call(d3.zoom().scaleExtent([.32,4]).on('zoom',e=>g.attr('transform',e.transform))).on('click',clearTrace);
 
 Object.keys(LAYERS).forEach(layer=>{
