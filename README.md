@@ -1,5 +1,12 @@
 # The Integrated Civilizational Plan — Logic & Usage
 
+## Published diagrams
+
+- [Integrated Civilizational Plan](./index.html)
+- [Multiplanetary Society Closure Map](./multiplanetary_society_diagram.html)
+- [AGI Transition Policy Map](./agi_transition_map.html)
+- [Superintelligence Pathways Map](./superintelligence_pathways_map.html)
+
 ## Why this exists
 
 The 1987 Rockwell *Integrated Space Plan* was a systems-engineering chart: one

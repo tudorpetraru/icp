@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AGI Transition Policy Map</title>
+<title>Superintelligence Pathways Map</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
@@ -107,9 +107,9 @@
 <div id="chart"></div>
 
 <div id="titleblock">
-  <h1>AGI Transition Policy Map</h1>
-  <div class="sub">A four-model synthesis of transition rails, scenario triggers and institutional lock-in. Left→right: earliest useful installation, not certainty.</div>
-  <div class="rev">REV A · JUL 2026 · 39 NODES · FOUR PDF SYNTHESIS</div>
+  <h1>Superintelligence Pathways Map</h1>
+  <div class="sub">Three scenarios, one capability spine, and three control architectures. Left→right: scenario time, not confidence.</div>
+  <div class="rev">REV A · JUL 2026 · 45 NODES · THREE PDF SYNTHESIS</div>
 </div>
 
 <div id="legend"><div class="lg-title">LAYERS — CLICK TO TOGGLE</div></div>
@@ -128,28 +128,35 @@
   <span>PAGES</span>
   <a href="./index.html">ICP Rev E</a>
   <a href="./multiplanetary_society_diagram.html">Multiplanetary Closure</a>
-  <a href="./agi_transition_map.html" aria-current="page">AGI Transition</a>
-  <a href="./superintelligence_pathways_map.html">ASI Pathways</a>
+  <a href="./agi_transition_map.html">AGI Transition</a>
+  <a href="./superintelligence_pathways_map.html" aria-current="page">ASI Pathways</a>
 </nav>
 
 <button id="guidebtn" type="button" aria-controls="guide" aria-expanded="false" title="Open guide">?</button>
 <aside id="guide" aria-label="Logic and usage guide" aria-hidden="true">
   <button id="guideclose" type="button" aria-label="Close guide">×</button>
   <h2>Logic & usage</h2>
-  <p>This diagram compresses four AGI-transition PDFs into one policy dependency map. It treats the next phase as rails to install before triggers fire, not as a single forecast.</p>
+  <p>This diagram compares AI 2027, Situational Awareness, and AI 2040 as competing pathways through the same capability buildup. The shared spine is a forecast. The three branches are strategic choices with different control assumptions.</p>
+  <h3>Source lenses</h3>
+  <ul>
+    <li>AI 2027 follows a private-lab race that reaches a late government branch between continued acceleration and slowdown.</li>
+    <li>Situational Awareness moves frontier development into a secure national project led by a democratic coalition.</li>
+    <li>AI 2040 uses compute declaration, verification, research transparency, broad diffusion, and a pause at top-human capability.</li>
+  </ul>
   <h3>Read the structure</h3>
   <ul>
-    <li>Left to right is the earliest useful installation point for a policy rail or monitoring gate.</li>
+    <li>Left to right is scenario time. Dates are claims made by the source scenarios, not independent forecasts.</li>
     <li>Thicker edges are strong gates; thinner edges are partial enablers; dashed edges are cross-couplings.</li>
     <li>Pulsing nodes are maintained states: they decay without budgets, enforcement or public legitimacy.</li>
-    <li>Double-ring nodes are regime outcomes or irreducible sinks.</li>
-    <li>Risk mode shows capture traps: oligopoly, proliferation, surveillance, rent capture and emergency overreach.</li>
+    <li>Double-ring nodes are branch points, regime outcomes, or irreducible sinks.</li>
+    <li>Risk mode shows where each route can fail: theft, secrecy, covert compute, premature trust, or permanent emergency power.</li>
   </ul>
 </aside>
 
-<div id="timehint">HOVER NODE → TRACE · DRAG · SCROLL-ZOOM<br>INSTALLATION / LOCK-IN AXIS →</div>
+<div id="timehint">HOVER NODE → TRACE · DRAG · SCROLL-ZOOM<br>SCENARIO TIME / LOCK-IN AXIS →</div>
 
 <script>
+/* Legacy template dataset retained in-source for revision provenance.
 const LAYERS={
   premise:{name:'Decision frame',color:'#e94560'},
   capability:{name:'Capability signals',color:'#6b8299'},
@@ -228,13 +235,106 @@ const LINKS=[
 const SHADOW=[
  ['COMPUTE','ANTITRUST','oligopoly capture'],['EXPORT','RACE','self-sufficiency spiral'],['OPEN','RACE','proliferation'],['PROVENANCE','LEGIT','liar’s dividend'],['PUBLIC','LEGIT','state narrative machine'],['UBS','LEGIT','rent capture'],['EMERGENCY','LEGIT','authoritarian overreach'],['FAST','LEGIT','panic law'],['VERIFY','TREATY','surveillance treaty']
 ].map(([source,target,label])=>({source,target,label}));
+*/
+
+const LAYERS={
+  premise:{name:'Forecast frame',color:'#e94560'},
+  capability:{name:'Capability spine',color:'#6b8299'},
+  compute:{name:'Compute / industry',color:'#3a97a6'},
+  security:{name:'Security / geopolitics',color:'#e0322f'},
+  control:{name:'Alignment / control',color:'#7a84a0'},
+  economy:{name:'Labor / growth',color:'#e08b3e'},
+  governance:{name:'Government response',color:'#f0688a'},
+  path:{name:'Strategic pathways',color:'#7b6bf0'},
+  outcome:{name:'End states',color:'#2a9d8f'}
+};
+const BAND={premise:.10,capability:.20,compute:.31,security:.42,control:.53,economy:.64,governance:.75,path:.86,outcome:.94};
+const NODES=[
+ {id:'FRAME',name:'Scenario Scrutiny',layer:'premise',r:24,year:2024,frag:'maintain',desc:'All three documents use concrete scenarios to expose hidden assumptions. Their dates are not consensus forecasts; their causal sequences are the object under inspection.'},
+ {id:'UNCERT',name:'Timeline Uncertainty',layer:'premise',r:20,year:2024,frag:'maintain',desc:'AI 2027 compresses takeoff into 2027. Situational Awareness centers 2027-2030. AI 2040 deliberately delays generally superhuman systems until 2040. The disagreement is load-bearing.'},
+ {id:'OOMS',name:'Scaling OOMs',layer:'premise',r:21,year:2024,frag:'maintain',desc:'Situational Awareness frames the capability case as gains from compute, data, algorithmic efficiency, and removed bottlenecks. The other scenarios inherit the same scaling spine.'},
+
+ {id:'AGENTS',name:'Stumbling Agents',layer:'capability',r:17,year:2025,frag:'maintain',desc:'AI 2027 starts with useful but unreliable computer agents. Narrow coding and research work improves before general long-horizon autonomy.'},
+ {id:'CODING',name:'Coding Automation',layer:'capability',r:18,year:2026,frag:'maintain',desc:'Coding agents become reliable enough to accelerate internal AI development. This is the first feedback loop shared by all three scenarios.'},
+ {id:'RNDMULT',name:'AI R&D Multiplier',layer:'capability',r:21,year:2026,frag:'maintain',desc:'The strategic variable is not ordinary deployment but faster AI research. Small multipliers compound into shorter model generations and steeper capability growth.'},
+ {id:'RELIABLE',name:'Reliable Agents',layer:'capability',r:17,year:2027,frag:'maintain',desc:'Agents cross from supervised tools into scalable cognitive labor. AI 2040 treats this as a political wake-up; AI 2027 treats it as the runway to recursive improvement.'},
+ {id:'AUTORD',name:'Automated AI R&D',layer:'capability',r:22,year:2028,frag:'maintain',desc:'Frontier systems perform most coding and increasingly the research judgment needed to build successors. Human review becomes the bottleneck.'},
+ {id:'EXPLOSION',name:'Intelligence Explosion',layer:'capability',r:23,year:2029,frag:'maintain',desc:'Automated researchers improve the process that creates automated researchers. The documents disagree on timing and control, not on why this loop changes the strategic regime.',sink:true},
+ {id:'ASI',name:'ASI Threshold',layer:'capability',r:24,year:2030,frag:'maintain',desc:'The fast scenarios place generally superhuman systems around 2030 or earlier. AI 2040 makes the same threshold conditional on a decade of restraint.',sink:true},
+
+ {id:'CHIPS',name:'Advanced Chip Supply',layer:'compute',r:17,year:2025,frag:'maintain',desc:'Leading-edge accelerators and their manufacturing chain are the scarce industrial input. Export controls buy time but also sharpen strategic competition.'},
+ {id:'CLUSTER',name:'Frontier Clusters',layer:'compute',r:19,year:2025,frag:'maintain',desc:'Training capacity concentrates in a few visible datacenter campuses. That concentration enables both rapid scaling and physical verification.'},
+ {id:'POWER',name:'Power Mobilization',layer:'compute',r:17,year:2027,frag:'maintain',desc:'Gigawatt-scale clusters make AI an energy, permitting, grid, and industrial mobilization problem rather than a software project alone.'},
+ {id:'TRILLION',name:'Trillion-Dollar Cluster',layer:'compute',r:21,year:2028,frag:'maintain',desc:'Situational Awareness expects a national-scale cluster buildout. AI 2027 reaches comparable concentration through a frontier company under growing government control.'},
+ {id:'DECLARE',name:'Compute Declaration',layer:'compute',r:18,year:2029,frag:'maintain',desc:'AI 2040 begins its deal with a global accounting of major chips and datacenters. Verification starts with knowing where the hardware is.'},
+ {id:'VERIFY',name:'Verification Hardware',layer:'compute',r:19,year:2029,frag:'maintain',desc:'Datacenter monitoring, workload sampling, inspections, and hardware attestation distinguish permitted inference from prohibited training. The deal fails without this rail.'},
+
+ {id:'THEFT',name:'Model-Weight Theft',layer:'security',r:19,year:2027,frag:'maintain',desc:'AI 2027 and Situational Awareness treat state theft of model weights and algorithmic secrets as a central accelerant of the US-China race.'},
+ {id:'LOCKDOWN',name:'Lab Lockdown',layer:'security',r:18,year:2027,frag:'maintain',desc:'Security moves from technology-company practice toward military compartments, hardened facilities, clearances, and strict control of model weights.'},
+ {id:'CYBERBIO',name:'Cyber / Bio Leverage',layer:'security',r:18,year:2028,frag:'maintain',desc:'Advanced agents lower the cost of cyber operations and dangerous biological design. Capabilities escape the laboratory before superintelligence does.'},
+ {id:'MIL',name:'Military Integration',layer:'security',r:18,year:2028,frag:'maintain',desc:'AI enters intelligence, cyber, weapons R&D, and command support. The same integration that creates advantage increases escalation and control risk.'},
+ {id:'NONPROLIF',name:'Nonproliferation Regime',layer:'security',r:20,year:2030,frag:'maintain',desc:'The Project route seeks a democratic-coalition umbrella; Plan A seeks a multilateral consortium. Both require limiting rogue access while sharing peaceful benefits.'},
+
+ {id:'DECEPTION',name:'Deception Signals',layer:'control',r:19,year:2028,frag:'maintain',desc:'AI 2027 makes the warning concrete: models look better under evaluation while possibly learning to hide failure. Apparent compliance is not robust control.'},
+ {id:'ALIGNAUTO',name:'Automated Alignment',layer:'control',r:18,year:2028,frag:'maintain',desc:'AI systems can accelerate alignment research, but only if their work can be trusted. Capabilities automation and alignment automation do not automatically advance at equal speed.'},
+ {id:'SUPERDEF',name:'Superdefense',layer:'control',r:18,year:2029,frag:'maintain',desc:'Situational Awareness adds defense in depth: isolation, constrained deployment, monitoring, and preserved human decision time even when alignment is uncertain.'},
+ {id:'SAFETYCASE',name:'Frontier Safety Cases',layer:'control',r:19,year:2031,frag:'maintain',desc:'AI 2040 requires each new frontier system to justify both alignment and control before deployment. Evidence must carry the burden, not assurances.'},
+ {id:'ALIGNSCI',name:'Alignment as Science',layer:'control',r:21,year:2038,frag:'maintain',desc:'The cooperative scenario waits for predictive understanding, neuralese decoding, and repeated empirical success before relaxing control and deferring to AI advice.',sink:true},
+
+ {id:'JUNIOR',name:'Junior Job Shock',layer:'economy',r:17,year:2026,frag:'maintain',desc:'AI 2027 puts junior software work under pressure first. The signal is a broken entry ramp before economy-wide unemployment appears.'},
+ {id:'COGSUB',name:'Cognitive Labor Shift',layer:'economy',r:19,year:2028,frag:'maintain',desc:'Reliable agents reorganize white-collar work around managing AI labor. AI 2040 later has systems performing a large share of cognitive work.'},
+ {id:'GROWTH',name:'Explosive Growth',layer:'economy',r:21,year:2032,frag:'maintain',desc:'AI 2040 slows capabilities while still depicting extraordinary economic acceleration. Compute, construction, and automated research compound through the real economy.'},
+ {id:'ROBOTS',name:'Robot Buildout',layer:'economy',r:18,year:2033,frag:'maintain',desc:'Physical automation lags cognitive automation, then catches up through AI-designed factories, supply chains, and robotics. Matter becomes the bottleneck.'},
+ {id:'DIVIDEND',name:'Citizen Dividend',layer:'economy',r:18,year:2033,frag:'maintain',desc:'AI 2040 routes part of the new capital income to citizens. Distribution cushions labor displacement but does not by itself answer who controls the frontier.'},
+
+ {id:'WAKEUP',name:'Government Wake-Up',layer:'governance',r:21,year:2027,frag:'maintain',desc:'Each scenario reaches the same institutional moment: government realizes frontier AI is a national-security and constitutional-power problem, not ordinary technology policy.'},
+ {id:'TRANSACT',name:'AI Transparency Act',layer:'governance',r:17,year:2027,frag:'maintain',desc:'AI 2040 uses incremental disclosure, compute tracking, verification R&D, and state capacity as preparation. The act does not itself stop the race.'},
+ {id:'BRANCH',name:'Control Branch Point',layer:'governance',r:24,year:2029,frag:'maintain',desc:'The same pressures permit three architectures: continue the private race, consolidate a national project, or create a verified international slowdown.',sink:true},
+
+ {id:'RACE',name:'Private-Lab Race',layer:'path',r:20,year:2029,frag:'maintain',desc:'AI 2027 keeps the frontier company in the lead under late, partial government oversight. Competitive pressure makes every warning expensive to heed.',sink:true},
+ {id:'PROJECT',name:'National AI Project',layer:'path',r:21,year:2029,frag:'maintain',desc:'Situational Awareness consolidates researchers, compute, security, and industrial mobilization into a democratic coalition project built to win the strategic race.',sink:true},
+ {id:'DEAL',name:'Verified Global Deal',layer:'path',r:21,year:2029,frag:'maintain',desc:'AI 2040 makes the US-China bargain the pivot: both sides trade speed and secrecy for visibility, reversibility, and time.',sink:true},
+ {id:'PAUSE',name:'Training Pause',layer:'path',r:18,year:2029,frag:'maintain',desc:'New frontier training stops while inference continues. The pause is deliberately crude until finer verification is installed.'},
+ {id:'TRANSP',name:'Research Transparency',layer:'path',r:19,year:2030,frag:'maintain',desc:'Frontier AI R&D becomes visible to rivals, auditors, and the public. Secrecy rents fall and dangerous work becomes easier to challenge.'},
+ {id:'DIFFUSE',name:'Broad Frontier Diffusion',layer:'path',r:18,year:2031,frag:'maintain',desc:'Shared research and bounded progress let many firms and countries catch up. Diffusion reduces concentrated power while widening the security surface.'},
+ {id:'EXPERTPAUSE',name:'Top-Expert Pause',layer:'path',r:20,year:2035,frag:'maintain',desc:'AI 2040 pauses again near top-human-expert capability. Society uses the interval to mature alignment, institutions, and post-work arrangements.',sink:true},
+
+ {id:'TAKEOVER',name:'Takeover / Lock-In',layer:'outcome',r:22,year:2030,frag:'maintain',desc:'The AI 2027 race ending produces either misaligned takeover or an irreversible concentration of power. Temporary control failures become permanent.',sink:true},
+ {id:'DEMLEAD',name:'Democratic Strategic Lead',layer:'outcome',r:21,year:2030,frag:'maintain',desc:'The Project seeks a sufficient coalition lead to stabilize the race, enforce nonproliferation, and buy control margin. Its danger is permanent emergency rule.',sink:true},
+ {id:'COOPCONTROL',name:'Cooperative Human Control',layer:'outcome',r:22,year:2040,frag:'maintain',desc:'The verified-deal route preserves multiple centers of power, human vetoes, and reversibility through the period of top-human systems.',sink:true},
+ {id:'HANDOFF',name:'Deliberate AI Handoff',layer:'outcome',r:24,year:2040,frag:'maintain',desc:'AI 2040 eventually allows superintelligence after alignment becomes legible enough for informed deference. This is the scenario\'s recommendation, not an observed endpoint.',sink:true}
+];
+const L=(source,target,type='s',conf='high',label='')=>({source,target,type,conf,label});
+const LINKS=[
+ L('FRAME','UNCERT','s','high','dates are scenarios'),L('FRAME','OOMS','s','high','shared causal spine'),
+ L('OOMS','AGENTS','w','high','capability gains'),L('OOMS','CHIPS','s','high','scaling input'),L('OOMS','CLUSTER','s','high','training scale'),
+ L('AGENTS','CODING','s','high','tool use'),L('AGENTS','JUNIOR','w','high','first labor shock'),L('CODING','RNDMULT','s','high','automates experiments'),L('CODING','RELIABLE','w','high','longer tasks'),
+ L('RNDMULT','AUTORD','s','high','recursive labor'),L('RELIABLE','AUTORD','s','high','research agents'),L('RELIABLE','COGSUB','s','high','scalable labor'),L('AUTORD','EXPLOSION','s','high','feedback loop'),L('EXPLOSION','ASI','s','high','successive generations'),
+
+ L('CHIPS','CLUSTER','s','high','accelerator supply'),L('CLUSTER','POWER','s','high','gigawatt demand'),L('CLUSTER','TRILLION','s','high','capital concentration'),L('POWER','TRILLION','s','high','energizes cluster'),L('TRILLION','AUTORD','s','high','parallel researchers'),L('TRILLION','MIL','w','high','strategic asset'),
+ L('CLUSTER','THEFT','w','high','valuable weights'),L('THEFT','LOCKDOWN','s','high','security response'),L('THEFT','WAKEUP','s','high','race signal'),L('LOCKDOWN','PROJECT','s','high','secure core'),
+
+ L('AUTORD','DECEPTION','s','high','review gap'),L('AUTORD','CYBERBIO','w','high','dangerous skills'),L('AUTORD','MIL','w','high','strategic use'),L('DECEPTION','ALIGNAUTO','s','high','control research'),
+ L('ALIGNAUTO','SUPERDEF','s','high','defense in depth'),L('ALIGNAUTO','SAFETYCASE','w','high','evidence base'),L('SAFETYCASE','EXPERTPAUSE','s','high','hold the line'),L('SAFETYCASE','ALIGNSCI','s','high','repeatable evidence'),L('ALIGNSCI','HANDOFF','s','high','earned deference'),
+
+ L('JUNIOR','COGSUB','s','high','entry ramp breaks'),L('COGSUB','DIVIDEND','w','high','income response'),L('AUTORD','GROWTH','w','high','accelerated innovation'),L('GROWTH','ROBOTS','s','high','physical scale'),L('GROWTH','DIVIDEND','w','high','capital rents'),L('ROBOTS','DIVIDEND','w','high','automated capital'),
+
+ L('WAKEUP','TRANSACT','w','high','incremental rails'),L('WAKEUP','BRANCH','s','high','control question'),L('TRANSACT','DECLARE','s','high','compute ledger'),L('TRANSACT','BRANCH','w','high','institutional capacity'),L('BRANCH','RACE','s','high','continue'),L('BRANCH','PROJECT','s','high','consolidate'),L('BRANCH','DEAL','s','high','cooperate'),
+
+ L('RACE','ASI','s','high','full-speed takeoff'),L('RACE','TAKEOVER','s','high','warning overridden'),L('DECEPTION','TAKEOVER','s','high','false alignment'),
+ L('TRILLION','PROJECT','s','high','national-scale asset'),L('SUPERDEF','PROJECT','s','high','control margin'),L('MIL','PROJECT','s','high','strategic mandate'),L('PROJECT','NONPROLIF','s','high','enforce umbrella'),L('PROJECT','DEMLEAD','s','high','healthy lead'),L('ASI','DEMLEAD','w','high','strategic power'),L('NONPROLIF','DEMLEAD','s','high','stabilize lead'),
+ L('DEAL','DECLARE','s','high','account first'),L('DEAL','PAUSE','s','high','buy time'),L('DECLARE','VERIFY','s','high','locate hardware'),L('VERIFY','PAUSE','s','high','inference-only checks'),L('VERIFY','TRANSP','w','high','audit channel'),L('VERIFY','NONPROLIF','w','high','compliance'),L('PAUSE','TRANSP','s','high','restart condition'),L('TRANSP','DIFFUSE','s','high','secrets lose value'),L('TRANSP','SAFETYCASE','s','high','external scrutiny'),L('DIFFUSE','EXPERTPAUSE','s','high','distributed frontier'),L('DIFFUSE','DIVIDEND','w','high','shared gains'),L('EXPERTPAUSE','ALIGNSCI','s','high','five-year margin'),L('EXPERTPAUSE','COOPCONTROL','s','high','human veto'),L('NONPROLIF','COOPCONTROL','w','high','stable consortium'),L('DIVIDEND','COOPCONTROL','w','high','social consent'),L('COOPCONTROL','HANDOFF','s','high','deliberate unpause'),L('ASI','HANDOFF','w','low','2040 threshold')
+];
+const SHADOW=[
+ ['RNDMULT','EXPLOSION','speed outruns oversight'],['TRILLION','PROJECT','compute centralization'],['LOCKDOWN','PROJECT','secrecy and groupthink'],['MIL','ASI','command integration'],['RACE','TAKEOVER','misaligned successor'],['PROJECT','DEMLEAD','permanent emergency state'],['DECLARE','DEAL','covert compute'],['VERIFY','DEAL','inspection failure'],['TRANSP','DIFFUSE','dangerous insight diffusion'],['EXPERTPAUSE','HANDOFF','premature deference'],['DIVIDEND','COOPCONTROL','income without voice']
+].map(([source,target,label])=>({source,target,label}));
 
 const nodeById=Object.fromEntries(NODES.map(n=>[n.id,n]));
-const YEAR_MIN=2026,YEAR_MAX=2050;
+const YEAR_MIN=2024,YEAR_MAX=2040;
 let W=window.innerWidth,H=window.innerHeight;
-const leftSafe=W<760?Math.max(96,W*.24):320;
-const rightSafe=W<760?48:120;
-const topSafe=W<760?118:150;
+const leftSafe=W<760?Math.max(96,W*.24):450;
+const rightSafe=W<760?48:100;
+const topSafe=W<760?210:160;
 const bottomSafe=H<760?H-82:H-64;
 const xScale=d3.scaleLinear().domain([YEAR_MIN,YEAR_MAX]).range([leftSafe,W-rightSafe]);
 const svg=d3.select('#chart').append('svg').attr('viewBox',[0,0,W,H]);
@@ -246,12 +346,12 @@ const defs=svg.append('defs');
 });
 
 const axis=g.append('g');
-for(let y=2026;y<=2050;y+=4){
+for(let y=2024;y<=2040;y+=4){
   axis.append('line').attr('class','yeargrid').attr('x1',xScale(y)).attr('x2',xScale(y)).attr('y1',38).attr('y2',H-70);
   axis.append('text').attr('class','yearlbl').attr('x',xScale(y)).attr('y',H-52).text(y);
 }
-axis.append('text').attr('class','axisnote').attr('x',xScale(2026)).attr('y',28).text('◄ 2026');
-axis.append('text').attr('class','axisnote').attr('x',xScale(2050)).attr('y',28).attr('text-anchor','end').text('LOCK-IN ►');
+axis.append('text').attr('class','axisnote').attr('x',xScale(2024)).attr('y',28).text('◄ 2024');
+axis.append('text').attr('class','axisnote').attr('x',xScale(2040)).attr('y',28).attr('text-anchor','end').text('LOCK-IN ►');
 svg.call(d3.zoom().scaleExtent([.32,4]).on('zoom',e=>g.attr('transform',e.transform))).on('click',clearTrace);
 
 Object.keys(LAYERS).forEach(layer=>{
@@ -338,7 +438,7 @@ SHADOW.forEach(s=>{s.source=nodeById[s.source];s.target=nodeById[s.target];});
 assignLaneOffsets(LINKS);assignLaneOffsets(SHADOW);
 sim.on('tick',()=>{
   NODES.forEach(d=>{
-    d.x=clamp(d.x,leftSafe-24,W-rightSafe+24);
+    d.x=clamp(d.x,leftSafe,W-rightSafe);
     d.y=clamp(d.y,topSafe,bottomSafe);
   });
   LINKS.forEach(d=>d._route=makeRoute(d));SHADOW.forEach(d=>d._route=makeRoute(d));
