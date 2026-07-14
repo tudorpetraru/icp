@@ -408,7 +408,7 @@ function buildDiagram(root, cfg) {
   const d3 = window.d3;
   const {
     nodes: NODES, links: LINKS, layers: LAYERS, layerOrder, shadow: SHADOW_IN = [],
-    title = '', subtitle = '', rev = '', yearRange = [2025, 2050], yearTicks = null,
+    title = '', subtitle = '', rev = '', yearRange = [2025, 2050], yearTicks = null, timeScale = 'linear',
     legend = true, timeAxis = true,
   } = cfg;
 
@@ -422,7 +422,12 @@ function buildDiagram(root, cfg) {
   const W = root.clientWidth || 1280, H = root.clientHeight || 800;
   const GRAPH_W = W < 700 ? 1600 : W;
   const [YEAR_MIN, YEAR_MAX] = yearRange;
-  const xScale = d3.scaleLinear().domain([YEAR_MIN, YEAR_MAX]).range([Math.max(150, GRAPH_W * 0.13), GRAPH_W - 90]);
+  const xStart = Math.max(150, GRAPH_W * 0.13), xEnd = GRAPH_W - 90;
+  const scaleYears = timeScale === 'milestone' && yearTicks && yearTicks.length > 1
+    ? yearTicks
+    : [YEAR_MIN, YEAR_MAX];
+  const scalePositions = scaleYears.map((_, i) => xStart + (xEnd - xStart) * (i / (scaleYears.length - 1)));
+  const xScale = d3.scaleLinear().domain(scaleYears).range(scalePositions).clamp(true);
   const nodeById = Object.fromEntries(NODES.map(n => [n.id, n]));
   const isMajor = d => d.layer === ORDER[0] || d.sink || d.r >= 20;
 
@@ -691,7 +696,7 @@ function buildDiagram(root, cfg) {
 
   // ---------- legend ----------
   const hidden = new Set();
-  let specOn = false, shadowOn = false;
+  let specOn = true, shadowOn = false;
   if (legend) {
     const lg = document.createElement('div');
     lg.className = 'ds-legend-panel';
@@ -727,8 +732,8 @@ function buildDiagram(root, cfg) {
     const hasLow = LINKS.some(l => l.conf === 'low');
     if (hasLow) {
       const spec = document.createElement('button');
-      Object.assign(spec.style, { marginTop: '8px', width: '100%', padding: '7px 8px', background: 'transparent', border: '1px solid #6b7285', color: '#4f5668', fontFamily: 'inherit', fontSize: '10.5px', letterSpacing: '.06em', cursor: 'pointer', borderRadius: '3px', textTransform: 'uppercase' });
-      spec.textContent = 'Show speculative edges';
+      Object.assign(spec.style, { marginTop: '8px', width: '100%', padding: '7px 8px', background: '#4f5668', border: '1px solid #6b7285', color: PAPER, fontFamily: 'inherit', fontSize: '10.5px', fontWeight: '600', letterSpacing: '.06em', cursor: 'pointer', borderRadius: '3px', textTransform: 'uppercase' });
+      spec.textContent = 'Hide speculative edges';
       spec.onclick = () => { specOn = !specOn; spec.textContent = specOn ? 'Hide speculative edges' : 'Show speculative edges'; spec.style.background = specOn ? '#4f5668' : 'transparent'; spec.style.color = specOn ? PAPER : '#4f5668'; spec.style.fontWeight = specOn ? '600' : '400'; updateVisibility(); clearTrace(); };
       lg.appendChild(spec);
     }
@@ -792,10 +797,11 @@ function App() {
     layerOrder: DATA.layerOrder,
     shadow: DATA.shadow,
     title: "Longevity Escape Velocity / Human Immortality",
-    subtitle: "A dependency map, not a forecast. Click or hover a node to trace prerequisites and consequences. Low-confidence branches are hidden until toggled.",
-    rev: DATA.rev,
+    subtitle: "Milestone maturity, not a forecast. Time spacing is nonlinear: the dense near term is expanded and the long tail is compressed.",
+    rev: "REV B · JUL 2026 · 60 NODES",
     yearRange: DATA.yearRange,
-    yearTicks: [2026, 2035, 2050, 2075, 2100, 2150, 2200]
+    yearTicks: [2026, 2035, 2050, 2075, 2100, 2150, 2200],
+    timeScale: 'milestone'
   });
 }
 
