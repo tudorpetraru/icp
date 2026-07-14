@@ -6,6 +6,7 @@
 - [Multiplanetary Society Closure Map](./multiplanetary_society_diagram.html)
 - [AGI Transition Policy Map](./agi_transition_map.html)
 - [Superintelligence Pathways Map](./superintelligence_pathways_map.html)
+- [Longevity Escape Velocity / Human Immortality Blueprint](./longevity_immortality_blueprint.html)
 
 ## Why this exists
 
